@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html layout:decorator="thymeleaf/layout/layout_blank">
+<head>
+<title layout:title-pattern="$LAYOUT_TITLE : $CONTENT_TITLE">[(#{title.detail})] - [(#{title.list})]</title>
+</head>
+<body>
+	<div layout:fragment="content">
+		<section class="content">
+			<div class="container-fluid mt-2">
+				<div class="row">
+					<div class="col-lg-12">
+						<div class="card card-primary card-outline">
+							<div class="card-header">
+								<h5 class="card-title m-0" data-th-text="#{title.search}"></h5>
+							</div>
+							<div class="card-body">
+								<form id="search-form" class="form-horizontal">
+									<input type="hidden" name="BASELINE_ID">
+									<div class="row">
+										<div class="col-sm-4">
+											<div class="form-group row">
+												<label for="BILL_MONTH" class="col-sm-4 col-form-label" data-th-text="#{label.detail.bill.month}"></label>
+												<div class="col-sm-8">
+													<div class="input-group" id="BILL_MONTH" data-target-input="nearest">
+								                        <input type="text" name="BILL_MONTH" class="form-control datetimepicker-input" data-toggle="datetimepicker" data-target="#BILL_MONTH">
+								                        <div class="input-group-append" data-target="#BILL_MONTH" data-toggle="datetimepicker">
+								                            <div class="input-group-text d-block"><i class="fa fa-calendar"></i></div>
+								                        </div>
+								                    </div>
+							                    </div>
+											</div>
+										</div>
+										<div class="col-sm-4">
+											<div class="form-group row">
+												<label for="CONTRACT_TYPE_CD" class="col-sm-4 col-form-label" data-th-text="#{label.detail.contractType}"></label>
+												<div class="col-sm-8">
+													<select id="CONTRACT_TYPE_CD" name="CONTRACT_TYPE_CD"
+														class="form-control select2">
+														<option value="" selected="selected"
+															data-th-text="#{label.common.all}"></option>
+													</select>
+												</div>
+											</div>
+										</div>
+										<div class="col-sm-4">
+											<!-- text input -->
+											<div class="form-group row">
+												<label for="CONTRACT_NO" class="col-sm-4 col-form-label" data-th-text="#{label.detail.contractNo}"></label>
+												<div class="col-sm-8">
+													<input type="text" id="CONTRACT_NO" name="CONTRACT_NO" class="form-control">
+												</div>
+											</div>
+										</div>
+									</div>
+									<div class="row">
+										<div class="col-sm-4">
+											<div class="form-group row">
+												<label for="CHARGE_TYPE_CD" class="col-sm-4 col-form-label" data-th-text="#{label.detail.chargeType}"></label>
+												<div class="col-sm-8">
+													<select id="CHARGE_TYPE_CD" name="CHARGE_TYPE_CD"
+														class="form-control select2">
+														<option value="" selected="selected"
+															data-th-text="#{label.common.all}"></option>
+													</select>
+												</div>
+											</div>
+										</div>
+										<div class="col-sm-4">
+											<div class="form-group row">
+												<label for="RESOURCE_TYPE_CD" class="col-sm-4 col-form-label" data-th-text="#{label.detail.resourceType}"></label>
+												<div class="col-sm-8">
+													<select id="RESOURCE_TYPE_CD" name="RESOURCE_TYPE_CD"
+														class="form-control select2">
+														<option value="" selected="selected"
+															data-th-text="#{label.common.all}"></option>
+													</select>
+												</div>
+											</div>
+										</div>
+										<div class="col-sm-4">
+											<div class="form-group row">
+												<label for="TOWER_TYPE_CD" class="col-sm-4 col-form-label" data-th-text="#{label.detail.towerType}"></label>
+												<div class="col-sm-8">
+													<select id="TOWER_TYPE_CD" name="TOWER_TYPE_CD"
+														class="form-control select2">
+														<option value="" selected="selected"
+															data-th-text="#{label.common.all}"></option>
+													</select>
+												</div>
+											</div>
+										</div>
+									</div>
+									<div class="row">
+										<div class="col-sm-4">
+											<div class="form-group row">
+												<label for="RESOURCE_CATEGORY_CD_NM" class="col-sm-4 col-form-label" data-th-text="#{label.rate.resourceCategory}"></label>
+												<div class="input-group col-sm-8">
+							                        <input type="text" id="RESOURCE_CATEGORY_CD_NM" name="RESOURCE_CATEGORY_CD_NM" class="form-control" readonly="readonly">
+							                        <div class="input-group-append">
+							                            <button type="button" class="btn btn-default"><i class="fas fa-search"></i></button>
+													</div>
+							                    </div>
+											</div>
+										</div>
+										<div class="col-sm-4">
+											<!-- text input -->
+											<div class="form-group row">
+												<label for="REMARK" class="col-sm-4 col-form-label" data-th-text="#{label.detail.remark}"></label>
+												<div class="col-sm-8">
+													<input type="search" id="REMARK" name="REMARK" class="form-control">
+												</div>
+											</div>
+										</div>
+									</div>
+									<div class="row">
+										<div class="col-sm-12">
+											<div class="text-center">
+												<button type="submit" class="btn btn-sm btn-primary" data-th-text="#{button.search}"></button>
+												<button type="button" class="btn btn-sm btn-outline-primary" data-action-button="reset" data-th-text="#{button.reset}"></button>
+											</div>
+										</div>
+									</div>
+								</form>
+							</div>
+						</div>
+					</div>
+					<!-- /.col-lg-12 -->
+				</div>
+				<!-- /.row -->
+
+				<div class="row">
+					<div class="col-lg-12">
+						<div class="card card-primary card-outline">
+							<div class="card-header">
+								<h3 class="card-title" data-th-text="#{title.list}"></h3>
+								<div class="card-tools" th:if="${#authentication.name} == '51110154' or ${#authentication.name} == 'maxadmin'">
+									<button type="button" class="btn btn-sm btn-success" data-action-button="new">[(#{button.new})]</button>
+								</div>
+							</div>
+							<!-- /.card-header -->
+							<div class="card-body">
+								<table id="dataTable" class="nowrap table table-sm table-bordered table-hover table-striped">
+									<thead>
+										<tr>
+											<th></th>
+											<th data-th-text="#{label.detail.bill.month}"></th>
+											<th data-th-text="#{label.detail.contractType}"></th>
+											<th data-th-text="#{label.detail.contractNo}"></th>
+											<th data-th-text="#{label.detail.resourceType}"></th>
+											<th data-th-text="#{label.detail.towerType}"></th>
+											<th data-th-text="#{label.detail.resourceCategory}"></th>
+											<th data-th-text="#{label.detail.chargeType}"></th>
+											<th data-th-text="#{label.detail.usage}"></th>
+											<th data-th-text="#{label.detail.rate}"></th>
+											<th data-th-text="#{label.detail.amount}"></th>
+											<th data-th-text="#{label.detail.remark}"></th>										
+											<th data-th-text="#{label.detail.applyRate}"></th>
+											<th data-th-text="#{label.detail.serviceDays}"></th>
+											<th data-th-text="#{label.detail.days}"></th>
+											<th data-th-text="#{label.detail.usageTpmc}"></th>
+											<th data-th-text="#{label.detail.regUser}"></th>
+											<th data-th-text="#{label.detail.regDate}"></th>
+										</tr>
+									</thead>
+								</table>
+							</div>
+							<!-- /.card-body -->
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+	</div>
+
+	<th:block layout:fragment="script">
+		<script>
+			$(function() {
+				var form = $("#search-form");
+				var validator = form.validate({
+					errorPlacement: function(error, element) {
+						if ( element.hasClass( "select2" )) {
+							$(element).next().find('span span').addClass('is-invalid');
+						}
+					}
+				});
+				var selectedRowData;
+				
+				// 계약일자
+				$('#BILL_MONTH').createDatePicker({
+					format: 'YYYY/MM',
+					mode: 'months'
+				});
+				
+				// 리소스 카테고리 팝업
+				$('#RESOURCE_CATEGORY_CD_NM').createPopup({
+					type: 'baseline',
+					title: '리소스 카테고리',
+					code_id: 'BASELINE_ID',
+					code_nm: 'RESOURCE_CATEGORY_CD_NM'
+				});
+				
+				// 공통코드 콤보박스 생성
+				$('select[name="CONTRACT_TYPE_CD"]').createSelectBox({
+					code_id : 'CONTRACT_TYPE'
+				});
+				$('select[name="CHARGE_TYPE_CD"]').createSelectBox({
+					code_id : 'CHARGE_TYPE'
+				});
+				$('select[name="RESOURCE_TYPE_CD"]').createSelectBox({
+					code_id : 'RESOURCE_TYPE'
+				});
+				$('select[name="TOWER_TYPE_CD"]').createSelectBox({
+					code_id : 'TOWER_TYPE'
+				});
+
+				// 조회결과 테이블 생성
+				var dataTable = $('#dataTable').createDataTable({
+						url: _ctx + "/bill/detail/dataList",
+						params: {},
+						/* responsive: false,
+						processing: false,
+						serverSide: false,
+						bPaginate: false, */
+						columns: [
+							{
+								className: 'details-control',
+								orderable: false,
+								data: null,
+								defaultContent: ''
+							},
+							{data : "BILL_MONTH_ORG"},
+							{data : "CONTRACT_TYPE_NM"},
+							{data : "CONTRACT_NO"},
+							{data : "RESOURCE_TYPE_NM"},
+							{data : "TOWER_TYPE_NM"},
+							{data : "RESOURCE_CATEGORY_NM"},
+							{data : "CHARGE_TYPE_NM"},
+							{data : "USAGE"},
+							{data : "RATE"},
+							{data : "AMOUNT"},
+							{data : "REMARK"},
+							{data : "APPLY_RATE"},
+							{data : "SERVICE_DAYS"},
+							{data : "DAYS"},
+							{data : "USAGE_TPMC"},		
+							{data : "REG_USER_ID_NM"},
+							{data : "REG_DT"}
+						],
+						columnDefs: [
+							{
+								targets: [8,9,10,11,12,13,14],
+								className: 'text-right'
+							}
+						]
+				});
+				
+				// 폼 전송 이벤트
+				form.submit(function(e) {
+				    e.preventDefault();
+				    $.fn.executeAction('search');
+				});
+				
+				// 프로세스 처리 함수
+				$.fn.executeAction = function(procType) {
+					switch(procType) {
+						case 'clearResult' :	// 조회결과 초기화
+							$('#dataTable tbody').html('<tr><td valign="top" colspan="16" class="dataTables_empty">[(#{msg.empty.data})]</td></tr>');
+							
+							break;
+						case 'reset' :		// 조회조건 초기화
+							form[0].reset();
+							form.find('[type="hidden"]').val('');
+							form.find("select").trigger("change");
+							
+							$.fn.executeAction('clearResult');
+							
+							break;
+						case 'new' :		// 신규
+							parent.tabsComp.createTabs({
+								id: 'new',
+								title: '[(#{button.new})]',
+								isIframe: true,
+								url: _ctx + '/bill/detail/regist',
+								method: 'add',
+								closable: true
+							});
+						
+							break;
+						case 'update' :		// 수정
+							parent.tabsComp.createTabs({
+								id: 'update',
+								title: selectedRowData['CONTRACT_TYPE_CD_NM'] + '[' + selectedRowData['CONTRACT_NO'] + ']',
+								isIframe: true,
+								url: _ctx + '/bill/detail/update',
+								method: 'add',
+								closable: true,
+								sendData: {
+									CONTRACT_TYPE_CD: selectedRowData['CONTRACT_TYPE_CD'],
+									CONTRACT_NO: selectedRowData['CONTRACT_NO']
+								}
+							});
+						
+							break;
+						case 'search' :
+							var dataTableParams = form.serialize();
+					    	dataTable.ajax.url(_ctx + '/bill/detail/dataList?' + dataTableParams).draw();
+							break;
+						default :
+							;
+					}
+				}
+				
+				// 버튼 이벤트
+				$('[data-action-button]').on('click', function() {
+					$(this).executeAction($(this).data('action-button'));
+				});
+				
+				// 목록 더블클릭 이벤트
+				/* $('#dataTable tbody').on('dblclick', 'tr', function() {
+					selectedRowData = dataTable.row(this).data();
+					
+					$.fn.executeAction('update');
+				}); */
+			});
+		</script>
+	</th:block>
+</body>
+</html>

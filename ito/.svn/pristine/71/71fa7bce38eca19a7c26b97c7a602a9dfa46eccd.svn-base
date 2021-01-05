@@ -1,0 +1,54 @@
+package kr.co.kyobo.config;
+
+import javax.sql.DataSource;
+
+import org.apache.ibatis.session.SqlSessionFactory;
+import org.mybatis.spring.SqlSessionFactoryBean;
+import org.mybatis.spring.SqlSessionTemplate;
+import org.mybatis.spring.annotation.MapperScan;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.jdbc.DataSourceBuilder;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
+import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
+
+import com.zaxxer.hikari.HikariDataSource;
+
+@Configuration
+@MapperScan(basePackages = MaximoDatasourceConfig.BASE_PACKAGES
+	, sqlSessionTemplateRef = "maximoSqlSessionTemplate")
+public class MaximoDatasourceConfig {
+	public static final String BASE_PACKAGES = "kr.co.kyobo.mapper.maximo";
+    public static final String MAPPER_XML_PATH = "classpath:mapper/maximo/db2/**/*.xml";
+
+    @Primary
+    @Bean(name = "maximoDataSource")
+    @ConfigurationProperties(prefix = "spring.maximo.datasource")
+    public DataSource dataSource() {
+        return DataSourceBuilder.create().type(HikariDataSource.class).build();
+    }
+
+    @Primary
+    @Bean(name = "maximoSqlSessionFactory")
+    public SqlSessionFactory sqlSessionFactory(@Qualifier("maximoDataSource") DataSource maximoDataSource)
+            throws Exception {
+        SqlSessionFactoryBean bean = new SqlSessionFactoryBean();
+        bean.setDataSource(maximoDataSource);
+        bean.setMapperLocations(new PathMatchingResourcePatternResolver().getResources(MAPPER_XML_PATH));
+        
+        //조회시 맵에 널값도 셋팅
+        org.apache.ibatis.session.Configuration configuration = new org.apache.ibatis.session.Configuration();
+        configuration.setCallSettersOnNulls(true);
+        bean.setConfiguration(configuration);
+        
+        return bean.getObject();
+    }
+
+    @Bean(name = "maximoSqlSessionTemplate")
+    public SqlSessionTemplate sqlSessionTemplate(
+            @Qualifier("maximoSqlSessionFactory") SqlSessionFactory sqlSessionFactory) throws Exception {
+        return new SqlSessionTemplate(sqlSessionFactory);
+    }
+}

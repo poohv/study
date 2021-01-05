@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html layout:decorator="thymeleaf/layout/layout_blank">
+<head>
+<title layout:title-pattern="$LAYOUT_TITLE : $CONTENT_TITLE">[(#{title.group})] - [(#{title.list})]</title>
+</head>
+<body>
+	<div layout:fragment="content">
+	<input type="hidden" id="SEQ" name="SEQ" class="form-control" required="required">
+	<input type="hidden" id="LASTSEQ" name="LASTSEQ" class="form-control" required="required">
+	<input type="hidden" id="LAST" name="LAST" class="form-control" required="required" value="1">
+		<section class="content">
+			<div class="container-fluid mt-2">
+				<div class="row">
+					<div class="col-lg-12">
+						<div class="card card-primary card-outline">
+							<div class="card-header">
+								<h5 class="card-title m-0" data-th-text="#{title.search}"></h5>
+							</div>
+							<div class="card-body">
+								<form id="search-form" class="form-horizontal">
+									<div class="row">
+										<div class="col-sm-4">
+											<!-- text input -->
+											<div class="form-group row">
+												<label for="SLA_GROUP_NM">[(#{label.group.slaNm})] </label>
+												<input type="text" id="SLA_GROUP_NM" name="SLA_GROUP_NM" class="form-control">
+											</div>
+										</div>
+										<div class="col-sm-4">
+											<!-- text input -->
+											<div class="form-group row">
+												<label for="USE_YN" class="col-sm-4 col-form-label" data-th-text="#{label.group.useYn}"></label>
+												<div class="col-sm-8">
+													<div class="icheck-primary form-check form-check-inline">
+														<input type="radio" id="USE_Y" name="USE_YN" class="form-check-input" value= "Y" checked>
+														<label for="USE_Y" class="form-check-label">[(#{label.common.yes})]
+														</label>
+													</div>
+													<div class="icheck-primary form-check form-check-inline">
+														<input type="radio" id="USE_N" name="USE_YN" class="form-check-input" value= "N">
+														<label for="USE_N" class="form-check-label">[(#{label.common.no})]
+														</label>
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+									<div class="row">
+										<div class="col-sm-12">
+											<div class="text-center">
+												<button type="submit" class="btn btn-sm btn-primary" data-th-text="#{button.search}"></button>
+												<button type="button" class="btn btn-sm btn-outline-primary" data-action-button="reset" data-th-text="#{button.reset}"></button>
+											</div>
+										</div>
+									</div>
+								</form>
+							</div>
+						</div>
+					</div>
+					<!-- /.col-lg-12 -->
+				</div>
+				<!-- /.row -->
+
+				<div class="row">
+					<div class="col-lg-12">
+						<div class="card card-primary card-outline">
+							<div class="card-header">
+								<h3 class="card-title" data-th-text="#{title.list}"></h3>
+								<div class="card-tools">
+									<button type="button" class="btn btn-sm btn-success" data-action-button="new">[(#{button.new})]</button>
+									<button type="button" class="btn btn-sm btn-success" data-action-button="save">[(#{button.save})]</button>
+									<button type="button" class="btn btn-sm btn-success" data-action-button="order">[(#{button.order})]</button>
+								</div>
+							</div>
+							<!-- /.card-header -->
+							<div class="card-body">
+								<table id="dataTable" class="table table-sm table-bordered table-hover table-striped">
+									<thead>
+										<tr>
+											<th data-th-text="#{label.group.slaGroupId}"></th>
+											<th data-th-text="#{label.group.slaGroupNm}"></th>
+											<th data-th-text="#{label.group.useYn}"></th>
+											<th data-th-text="#{label.group.orderNo}"></th>
+										</tr>
+									</thead>
+								</table>
+							</div>
+							<!-- /.card-body -->
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+	</div>
+
+	<th:block layout:fragment="script">
+		<script>
+			$(function() {
+				var form = $("#search-form");
+				var validator = form.validate();
+				var selectedRowData;
+				
+				$("#SEQ").val("");
+
+				// 조회결과 테이블 생성
+				var dataTable = $('#dataTable').createDataTable({
+						url: _ctx + "/tower/group/dataList",
+						bPaginate: false,
+						dom : '<"float-right"i>frt',
+						params: {},
+						columns: [
+							{data : "SLA_GROUP_ID"},
+							{data : "SLA_GROUP_NM"},
+							{data : "USE_YN"},
+							{data : "ORDER_NO"}
+						],
+						columnDefs: [
+// 							{
+// 								targets: [0],
+// 								className: 'text-center',
+// 								render: function ( data, type, full ) {
+// 									return '<span>'+data+'</span><input type="hidden" name="SLA_GROUP_ID" value="'+full['SLA_GROUP_ID']+'">';
+// 								}
+// 							},
+							{
+								targets: [0],
+								className: 'text-center',
+								render: function ( data, type, full ) {
+									return '<span>'+data+'</span><input type="hidden" name="SLA_GROUP_ID" value="'+full['SLA_GROUP_ID']+'">';
+								}
+							},							
+							{
+								targets: [1],
+								className: 'text-center',
+ 								render: function ( data, type, full ) {
+ 									return '<input type="text" name="SLA_GROUP_NM" class="form-control" value="'+full['SLA_GROUP_NM']+'">';
+ 								}
+							},
+							{
+								targets: [2],
+								className: 'text-center',
+								render: function ( data, type, full ) {
+									var checkedY = (full['USE_YN'] == 'Y') ? 'checked' : '';
+									var checkedN = (full['USE_YN'] == 'N') ? 'checked' : '';
+									
+									return '<div class="icheck-primary form-check form-check-inline">'
+										+'	<input type="radio" id="USE_YY' + full['SLA_GROUP_ID'] + '" name="USE_YN' + full['SLA_GROUP_ID'] + '" class="form-check-input" value= "Y" ' + checkedY + '>'
+										+'	<label for="USE_YY' + full['SLA_GROUP_ID'] + '" class="form-check-label">[(#{label.common.yes})]'
+										+'	</label>'
+										+'</div>'
+										+'<div class="icheck-primary form-check form-check-inline">'
+										+'		<input type="radio" id="USE_NN' + full['SLA_GROUP_ID'] + '" name="USE_YN' + full['SLA_GROUP_ID'] + '" class="form-check-input" value= "N" ' + checkedN + '>'
+										+'		<label for="USE_NN' + full['SLA_GROUP_ID'] + '" class="form-check-label">[(#{label.common.no})]'
+										+'		</label>'
+										+'</div>';										
+ 								}
+							},
+							{
+								targets: [3],
+								visible: false
+							}
+						],
+						callback : function(){
+							$('#dataTable tbody').sortable({
+								placeholder : "bg-warning"
+							}); 
+						}
+				});
+				
+				// 폼 전송 이벤트
+				form.submit(function(e) {
+				    e.preventDefault();
+				    $.fn.executeAction('search');
+				});
+				
+				// 프로세스 처리 함수
+				$.fn.executeAction = function(procType) {
+					switch(procType) {
+						case 'reset' :		// 조회조건 초기화
+							form[0].reset();
+							form.find("select").trigger("change");
+							break;
+						case 'new' :		// 신규
+							var dataArrayOrderNo = [];
+						
+							$('#dataTable [name="SLA_GROUP_ID"]').each(function(idx, element) {
+								console.log(idx + ' : ' + $(this).val());
+								dataArrayOrderNo.push($(this).val());
+							});
+							
+							var seq = parseInt($("#LAST").val());
+							var last = parseInt(dataArrayOrderNo.pop());
+							
+							if($('[name="LAST"]').val() == '1') {
+								var sa = last + 1;
+								$("#LAST").val(sa);
+							}else{
+								var sa = seq + 1;
+								$("#LAST").val(sa);
+							};
+						
+							$('#dataTable tbody').append('<tr><td class=\"text-center\"><input type=\"hidden\" id=\"SLA_GROUP_ID\" name=\"SLA_GROUP_ID\" class=\"form-control\" required=\"required\" value= '+sa+'>'+sa+'</td>'
+														+'<td class=\"text-center\"><input type=\"text\" id=\"SLA_GROUP_NM\" name=\"SLA_GROUP_NM\" class=\"form-control\" required=\"required\"></td>'
+														+'<td class=\"text-center\">'
+														+'<div class=\"icheck-primary form-check form-check-inline\">'
+														+'	<input type=\"radio\" id=\"USE_YY'+sa+'\" name=\"USE_YN'+sa+'\" class=\"form-check-input\" value= \"Y\">'
+														+'	<label for=\"USE_YY'+sa+'\" class=\"form-check-label\">[(#{label.common.yes})]'
+														+'	</label>'
+														+'</div>'
+														+'<div class=\"icheck-primary form-check form-check-inline\">'
+														+'		<input type=\"radio\" id=\"USE_NN'+sa+'\" name=\"USE_YN'+sa+'\" class=\"form-check-input\" value= \"N\">'
+														+'		<label for=\"USE_NN'+sa+'\" class=\"form-check-label\">[(#{label.common.no})]'
+														+'		</label>'
+														+'</div>'
+														+'</td>'
+														+'</tr>'
+														);
+							
+							$("#LASTSEQ").val(1);
+							break;
+						case 'save' :		// 수정
+							
+						var dataArrayGroupId = [];
+						var dataArrayGroupNm = [];
+						var dataArrayUseYn = [];
+						
+						$('#dataTable [name="SLA_GROUP_ID"]').each(function(idx, element) {
+							console.log(idx + ' : ' + $(this).val());
+							dataArrayGroupId.push($(this).val());
+						});
+						
+						$('#dataTable [name="SLA_GROUP_NM"]').each(function(idx, element) {
+							console.log(idx + ' : ' + $(this).val());
+							dataArrayGroupNm.push($(this).val());
+						});
+						
+						var radio = $("input[type=radio]");
+						
+						$.each(radio, function (key, value){
+							if($(this)[0].checked == true){
+								dataArrayUseYn.push($(this).val());
+							}
+						});
+						
+						var formData = {};
+						$(form).serializeArray().map(function(x) {formData[x.name] = x.value;});
+						formData['SLA_GROUP_ID'] = dataArrayGroupId.join(',');
+						formData['SLA_GROUP_NM'] = dataArrayGroupNm.join(',');
+						formData['USE_YN'] = dataArrayUseYn.join(',');
+						
+						// 폼 데이터 전송
+						$.sendData({
+							url: '/tower/group/saveSlaGroupId',
+							data: formData,
+							notification: true,
+							isIframe: true
+						}, function(data) {
+							if(data.result == 'S') {
+								var dataTableParams = form.serialize();
+								$("#SEQ").val(1);
+						    	dataTable.ajax.url(_ctx + '/tower/group/dataList?' + dataTableParams).draw();
+							}
+						});
+						
+							break;
+						case 'search' :
+							var dataTableParams = form.serialize();
+							$("#SEQ").val(1);
+					    	dataTable.ajax.url(_ctx + '/tower/group/dataList?' + dataTableParams).draw();
+							break;
+						case 'order' :
+							if($('#SEQ').val() != 1){
+								
+									alert("업무그룹 관리 조회 후 변경 가능합니다.");
+									return;
+							}
+							
+							var dataArrayGroupId = [];
+							
+							$('#dataTable [name="SLA_GROUP_ID"]').each(function(idx, element) {
+									console.log(idx + ' : ' + $(this).val());
+									dataArrayGroupId.push($(this).val());
+							});
+							
+							var formData = {};
+							$(form).serializeArray().map(function(x) {formData[x.name] = x.value;});
+							formData['SLA_GROUP_ID'] = dataArrayGroupId.join(',');
+							
+							// 폼 데이터 전송
+							$.sendData({
+								url: '/tower/group/updateOrderNo',
+								data: formData,
+								notification: true,
+								isIframe: true
+							}, function(data) {
+								if(data.result == 'S') {
+									var dataTableParams = form.serialize();
+									$("#SEQ").val(1);
+							    	dataTable.ajax.url(_ctx + '/bill/group/dataList?' + dataTableParams).draw();
+								}
+							});
+							
+							break;
+						default :
+							;
+					}
+				}
+				
+				// 버튼 이벤트
+				$('[data-action-button]').on('click', function() {
+					$(this).executeAction($(this).data('action-button'));
+				});
+				
+			});
+		</script>
+	</th:block>
+</body>
+</html>

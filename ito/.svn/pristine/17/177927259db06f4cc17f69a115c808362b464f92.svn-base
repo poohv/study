@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html layout:decorator="thymeleaf/layout/layout_blank">
+<head>
+<title layout:title-pattern="$LAYOUT_TITLE : $CONTENT_TITLE">[(#{title.sr.srGroup})] - [(#{title.list})]</title>
+</head>
+<body>
+	<div layout:fragment="content">
+		<section class="content">
+			<div class="container-fluid mt-2">
+				<div class="row">
+					<div class="col-lg-12">
+						<div class="card card-primary card-outline">
+							<div class="card-header">
+								<h5 class="card-title m-0" data-th-text="#{title.search}"></h5>
+							</div>
+							<div class="card-body">
+								<form id="search-form" class="form-horizontal">
+									<div class="row">
+										<div class="col-sm-4">
+											<!-- text input -->
+											<div class="form-group row">
+												<label for="PERSONGROUP" class="col-sm-4 col-form-label" data-th-text="#{label.resource.towerType}"></label>
+												<div class="col-sm-8">
+													<select id="PERSONGROUP" name="PERSONGROUP" class="form-control select2" required="required">
+														<option value="" selected="selected" data-th-text="#{label.common.all}"></option>
+													</select>
+												</div>
+											</div>
+										</div>
+									</div>
+									<div class="row">
+										<div class="col-sm-12">
+											<div class="text-center">
+												<button type="submit" class="btn btn-sm btn-primary" data-th-text="#{button.search}"></button>
+												<button type="button" class="btn btn-sm btn-outline-primary" data-action-button="reset" data-th-text="#{button.reset}"></button>
+											</div>
+										</div>
+									</div>
+								</form>
+							</div>
+						</div>
+					</div>
+					<!-- /.col-lg-12 -->
+				</div>
+				<!-- /.row -->
+
+				<div class="row">
+					<div class="col-lg-12">
+						<div class="card card-primary card-outline">
+							<div class="card-header">
+								<h3 class="card-title" data-th-text="#{title.list}"></h3>
+								<div class="card-tools">
+									<button type="button" class="btn btn-sm btn-primary" data-action-button="save" disabled="disabled">[(#{button.save})]</button>
+									<button type="button" class="btn btn-sm btn-success" data-action-button="new" disabled="disabled">[(#{button.add})]</button>
+								</div>
+							</div>
+							<!-- /.card-header -->
+							<div class="card-body">
+								<table id="dataTable" class="table table-sm table-bordered table-hover table-striped">
+									<thead>
+										<tr>
+											<th data-th-text="#{label.srGroup.personId}"></th>
+											<th data-th-text="#{label.srGroup.name}"></th>
+											<th data-th-text="#{label.srGroup.email}"></th>
+											<th></th>
+										</tr>
+									</thead>
+								</table>
+							</div>
+							<!-- /.card-body -->
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+	</div>
+
+	<th:block layout:fragment="script">
+		<script>
+			$(function() {
+				var form = $("#search-form");
+				var validator = form.validate({
+					errorPlacement: function(error, element) {
+						if ( element.hasClass( "select2" )) {
+							$(element).next().find('span span').addClass('is-invalid');
+						}
+					}
+				});
+				var selectedRowData;
+				
+				$('select[name="PERSONGROUP"]').createSelectBox({
+					url: _ctx + '/sr/srGroup/findTowerGroupList'
+				});
+				
+				// 조회결과 테이블 생성
+				var dataTable = $('#dataTable').createDataTable({
+						bPaginate: false,
+						dom : 'B<"float-right"i>frt',
+						params: {PERSONGROUP: ' '},
+						columns: [
+							{data : "PERSONID", visible: false},
+							{data : "DISPLAYNAME"},
+							{data : "EMAILADDRESS"},
+							{
+								className: 'text-center text-danger btn-list-remove',
+								orderable: false,
+								data: null,
+								defaultContent: '<button type="button" class="btn p-0 m-0"><i class="fas fa-minus-circle text-danger"></i></button>'
+							}
+						],
+						columnDefs: [
+							{
+								targets: [1],
+								className: 'text-center'
+							}
+						]
+				});
+				
+				// 목록에서 제거
+				$('#dataTable').on('click', '.btn', function() {
+					dataTable.row($(this).parents('tr')).remove().draw();
+				});
+				
+				// 폼 전송 이벤트
+				form.submit(function(e) {
+				    e.preventDefault();
+				    
+				    if(!validator.valid()) return false;
+				    
+				    $(this).find('.select2').next().find('span span').removeClass('is-invalid');
+				    
+				    $.fn.executeAction('search');
+				});
+				
+				// 프로세스 처리 함수
+				$.fn.executeAction = function(procType) {
+					switch(procType) {
+						case 'reset' :		// 조회조건 초기화
+							form[0].reset();
+							form.find("select").trigger("change");
+							
+							$('[data-action-button="save"]').attr('disabled', 'disabled');
+							$('[data-action-button="new"]').attr('disabled', 'disabled');
+							
+							dataTable.rows().remove().draw();
+							
+							break;
+						case 'new' :		// 신규
+							// 사용자정보
+							$.fn.createPopup({
+								type: 'user',
+								title: '사용자 정보',
+								callback: function(data) {
+									var isExist = false;
+									
+									$('#dataTable tbody tr').each(function(i) {
+										var rowMap = dataTable.row(i).data();
+										
+										if(rowMap && rowMap['PERSONID'] == data['PERSONID']) {
+											isExist = true;
+										} 
+									});
+									
+									if(!isExist) {
+										dataTable.rows.add([data]).draw();
+									}
+								}
+							});
+						
+							break;
+						case 'save' :		// 저장
+							var formData = {};
+							$(form).serializeArray().map(function(x) {formData[x.name] = x.value;});
+						
+							var userArr = [];
+							
+							$('#dataTable tbody tr').each(function(i) {
+								var rowMap = dataTable.row(i).data();
+								
+								if(rowMap) {
+									userArr.push(rowMap);
+								}
+							});
+							
+							formData['userList'] = userArr;
+							
+							$.sendData({
+								url: '/sr/srGroup/registData',
+								data: formData,
+								notification: true,
+								isIframe: true
+							}, function(result) {
+								$.fn.executeAction('search');
+							});
+						
+							break;
+						case 'search' :
+							var formData = {};
+					    	$(form).serializeArray().map(function(x) {formData[x.name] = x.value;});
+					    	
+					    	$.sendData({
+								type: 'GET',
+								data: formData,
+								url: '/sr/srGroup/dataList'
+							}, function(result) {
+								dataTable.rows().remove().draw();
+								dataTable.rows.add(result.data).draw();
+								
+								$('[data-action-button="save"]').removeAttr('disabled');
+								$('[data-action-button="new"]').removeAttr('disabled');
+							});
+					    	
+							break;
+						default :
+							;
+					}
+				}
+				
+				// 버튼 이벤트
+				$('[data-action-button]').on('click', function() {
+					$.fn.executeAction($(this).data('action-button'));
+				});
+			});
+		</script>
+	</th:block>
+</body>
+</html>

@@ -1,0 +1,99 @@
+#Context 설정server:  servlet:    context-path: /ito#스프링 설정
+spring:  servlet:    multipart:      max-file-size: 20MB      max-request-size: 20MB      enabled: true
+  http:    encoding:
+      charset: UTF-8  #인코딩
+  devtools:
+    restart:
+      enabled: false
+    livereload:
+      enabled: true
+  #프로파일
+  profiles:    active: local     #local: 로컬, dev: 개발서버, prod: 운영서버
+    
+  #thymeleaf(뷰) 설정
+  thymeleaf:    view-names: thymeleaf/*       #뷰명이 thymeleaf로 시작하는것
+    suffix: .html                 #확장자
+    prefix: classpath:templates/ #뷰 파일 위치
+    check-template-location: true #브라우저에 수정사항 반영
+    cache: false                  #브라우저에 수정사항 반영(운영: true)
+  #토큰인증
+  auth:
+    login: /api/token,POST
+    authority: ROLE_USER
+    jwt:
+      ttl: 1h
+      
+#로그설정
+logging:
+  level:
+    root: info
+
+#암호화(jasypt)
+jasypt:
+  encryptor:
+    bean: jasyptStringEncrptor
+
+--- #local(로컬)
+spring:  profiles: local
+  #DB설정
+  maximo:
+    datasource:
+      driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
+      jdbc-url: ENC(4xInEWCv3uHryhTXG38evUj85wDTF/w5VMePgB5wfFNMc7CRm04fGjes/5dcSHEoPFutzZnw7nw=)      username: ENC(RKuKBWgzfPPKJe4K+mQYmg==)      password: ENC(Pm+uNXQwYRHGVJHJxKKINaxVF0M8GThs)
+  #Elasticsearch
+  data:
+    elasticsearch:
+      cluster-nodes: 10.33.5.250:9300
+      cluster-name: elasticsearch
+      repositories.enabled: true      http-url: 10.33.5.250:9200  #이메일  mail:    host: 10.33.6.5    port: 2525    properties:      mail:        smtp:          auth: false
+logging:  level:    root: info
+    kr:
+      co:
+        kyobo: info
+        kyobo.main: debug
+        kyobo.security: debug
+    org.springframework:
+      security: info
+#ELK 서버 설정sftp:  elk:    host: ENC(TrFAcfddBAEd/u90Hb4RuRXIUhsjs6lD)    port: 22    user: ENC(EhHmrih9IX/NkncOHqRbig==)    password: ENC(+G9CIYtb9whwkyFRxv5tjhkBl3sEoGSW)domain:  sr: http://10.33.6.250:8080/ito/main?menu_id=srupload:  path: D:/ITO/upload/  
+--- #dev(개발서버)
+spring:
+  profiles: dev
+  #DB설정
+  maximo:
+    datasource:
+      driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
+      jdbc-url: ENC(4xInEWCv3uHryhTXG38evUj85wDTF/w5VMePgB5wfFNMc7CRm04fGjes/5dcSHEoPFutzZnw7nw=)
+      username: ENC(RKuKBWgzfPPKJe4K+mQYmg==)
+      password: ENC(Pm+uNXQwYRHGVJHJxKKINaxVF0M8GThs)
+  #Elasticsearch
+  data:
+    elasticsearch:
+      cluster-nodes: 10.33.5.250:9300
+      cluster-name: elasticsearch
+      repositories.enabled: true      http-url: 10.33.5.250:9200  #이메일  mail:    host: 10.33.6.5    port: 2525    properties:      mail:        smtp:          auth: false
+logging:
+  level:
+    root: info
+#ELK 서버 설정sftp:  elk:    host: ENC(TrFAcfddBAEd/u90Hb4RuRXIUhsjs6lD)    port: 22    user: ENC(EhHmrih9IX/NkncOHqRbig==)    password: ENC(+G9CIYtb9whwkyFRxv5tjhkBl3sEoGSW)domain:  sr: http://10.33.6.250:8080/ito/main?menu_id=srupload:  path: D:/ITO/upload/  
+--- #prod(운영서버)
+spring:
+  profiles: prod
+  #DB설정
+  maximo:
+    datasource:
+      driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
+      jdbc-url: ENC(4xInEWCv3uHryhTXG38evUj85wDTF/w5VMePgB5wfFNMc7CRm04fGjes/5dcSHEoPFutzZnw7nw=)
+      username: ENC(RKuKBWgzfPPKJe4K+mQYmg==)
+      password: ENC(Pm+uNXQwYRHGVJHJxKKINaxVF0M8GThs)
+  #Elasticsearch
+  data:
+    elasticsearch:
+      cluster-nodes: 10.33.5.250:9300
+      cluster-name: elasticsearch
+      repositories.enabled: true      http-url: 10.33.5.250:9200
+  thymeleaf:
+    cache: true                  #브라우저에 수정사항 반영(운영: true)  #이메일  mail:    host: 10.33.6.5    port: 2525    properties:      mail:        smtp:          auth: false
+logging:
+  level:
+    root: info
+#ELK 서버 설정sftp:  elk:    host: ENC(TrFAcfddBAEd/u90Hb4RuRXIUhsjs6lD)    port: 22    user: ENC(EhHmrih9IX/NkncOHqRbig==)    password: ENC(+G9CIYtb9whwkyFRxv5tjhkBl3sEoGSW)domain:  sr: http://10.33.6.250:8080/ito/main?menu_id=srupload:  path: D:/ITO/upload/  

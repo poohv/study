@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html layout:decorate="~{thymeleaf/layout/layout_index}">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge;">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
+    <title layout:title-pattern="$LAYOUT_TITLE : $CONTENT_TITLE"> 메인</title>
+</head>
+<body>
+	<div layout:fragment="content">
+		<div class="headerWrap">
+	        <div class="container">
+	            <ul class="Ulrow">
+	                <li class="Licolumn left plf35">
+	                    <img src="images/logoKyoBo.png"  class="img ">
+	                    <h1 class="mlf25">IoT Service Potal</h1>
+	                </li>
+	                <li class="Licolumn right prt35">
+	                    <img src="images/logoIBM.png"  class="img ">
+	                </li>
+	            </ul>
+	        </div>
+	    </div>
+	    <div class="section">
+	        <div class="sectionWrap">
+	            <ul class="SWrap">
+	                <li class="Scol" style="background-color:#E7E7E7;">
+	                    <ul class="Srow">
+	                        <li class="Scolumn">
+	                            <h2>모니터링</h2>
+	                        </li>
+	                        <li class="Scolumn mt45" style="cursor: pointer;" onclick="location.href='#;';" onmouseover="image01.src='images/icon1_1.png';" onmouseout="image01.src='images/icon1.png';">
+	                            <div class="BoxWrap">
+	                                <div class="BoxInner  hvr-icon-grow">
+	                                    <div class="hvr-icon">
+	                                        <img src="images/icon1.png" id="image01">
+	                                        <p>checkMK</p>
+	                                    </div>
+	                                </div>
+	                            </div>
+	                        </li>
+	                        <li class="Scolumn mt45" style="cursor: pointer;" onclick="location.href='#;';" onmouseover="image02.src='images/icon2_1.png';" onmouseout="image02.src='images/icon2.png';">
+	                            <div class="BoxWrap">
+	                                <div class="BoxInner  hvr-icon-grow">
+	                                    <div class="hvr-icon">
+	                                        <img src="images/icon2.png" id="image02">
+	                                        <p>Grafana</p>
+	                                    </div>
+	                                </div>
+	                            </div>
+	                        </li>
+	                    </ul>
+	                </li>
+	                <li class="Scol" style="background-color:#F0F0F0;">
+	                    <ul class="Srow">
+	                        <li class="Scolumn">
+	                            <h2>과금관리</h2>
+	                        </li>
+	                        <li class="Scolumn mt45" style="cursor: pointer;" onclick="location.href='#;';" onmouseover="image03.src='images/icon3_1.png';" onmouseout="image03.src='images/icon3.png';">
+	                            <div class="BoxWrap">
+	                            	<a href="http://10.33.5.250:5601/" target="_blank">
+		                                <div class="BoxInner hvr-icon-grow">
+		                                    <div class="hvr-icon">
+		                                        <img src="images/icon3.png" id="image03">
+		                                        <p>kibana</p>
+		                                    </div>
+		                                </div>
+		                            </a>
+	                            </div>
+	                        </li>
+	                        <li class="Scolumn mt45" style="cursor: pointer;" onclick="location.href='#;';" onmouseover="image04.src='images/icon4_1.png';" onmouseout="image04.src='images/icon4.png';">
+	                            <div class="BoxWrap">
+	                                <a th:href="@{/main}">
+		                                <div class="BoxInner hvr-icon-grow">
+		                                    <div class="hvr-icon">
+		                                        <img src="images/icon4.png" id="image04">
+		                                        <p><em>과금 데이터 관리</em></p>
+		                                    </div>
+		                                </div>
+	                                </a>
+	                            </div>
+	                        </li>
+	                    </ul>
+	
+	                </li>
+	                <li class="Scol" style="background-color:#E7E7E7;">
+	                    <ul class="Srow">
+	                        <li class="Scolumn">
+	                            <h2>서비스 변경 장애 관리</h2>
+	                        </li>
+	                        <li class="Scolumn mt45" style="cursor: pointer;" onclick="location.href='#;';" onmouseover="image05.src='images/icon5_1.png';" onmouseout="image05.src='images/icon5.png';">
+	                            <div class="BoxWrap">
+	                            	<a th:href="@{/main?menu_id=sr}">
+		                                <div class="BoxInner hvr-icon-grow">
+		                                    <div class="hvr-icon">
+		                                        <img src="images/icon5.png" id="image05">
+		                                        <p><em>서비스요청</em>(RFS)</p>
+		                                    </div>
+		                                </div>
+		                            </a>
+	                            </div>
+	                        </li>
+	                        <li class="Scolumn mt45" style="cursor: pointer;" onclick="location.href='#;';" onmouseover="image06.src='images/icon6_1.png';" onmouseout="image06.src='images/icon6.png';">
+	                            <div class="BoxWrap">
+	                            	<a href="http://10.33.6.250/maximo/" target="_blank">
+		                                <div class="BoxInner hvr-icon-grow">
+		                                    <div class="hvr-icon">
+		                                        <img src="images/icon6.png"  id="image06">
+		                                        <p>maximo</p>
+		                                    </div>
+		                                </div>
+		                            </a>
+	                            </div>
+	                        </li>
+	                    </ul>
+	                </li>
+	            </ul>
+	        </div>
+	    </div>
+	</div>
+</body>
+</html>

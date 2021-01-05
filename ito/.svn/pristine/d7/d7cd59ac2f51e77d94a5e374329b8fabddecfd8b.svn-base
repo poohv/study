@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.kyobo.mapper.maximo.sr.SrGroupMapper">
+	<sql id="search_query">
+		SELECT *
+		FROM (
+			SELECT A.PERSONGROUP
+				, B.PERSONID 
+				, B.DISPLAYNAME 
+				, C.EMAILADDRESS 
+				, B.CELLPHONE 
+				, A.GROUPDEFAULT
+			FROM PERSONGROUPTEAM A, PERSON B, EMAIL C
+			WHERE A.RESPPARTY = B.PERSONID 
+			AND B.PERSONID  = C.PERSONID
+		)
+	</sql>
+	<sql id="search_conditions">
+		WHERE PERSONGROUP = #{PERSONGROUP}
+		<if test="PERSONID != null and PERSONID != ''">
+			AND PERSONID = #{PERSONID}
+		</if>
+		<if test="GROUPDEFAULT != null and GROUPDEFAULT != ''">
+			AND GROUPDEFAULT = #{GROUPDEFAULT}
+		</if>
+		ORDER BY DISPLAYNAME
+	</sql>
+	<select id="findAll" parameterType="HashMap" resultType="HashMap">
+		SELECT *
+		FROM (
+			<include refid="search_query"></include>
+			<include refid="search_conditions"></include>
+			<if test="length!=null and !length.equals('') and length > -1">
+				LIMIT ${length}
+				OFFSET ${start}
+			</if>
+		) A
+	</select>
+	
+	<select id="findCount" parameterType="HashMap" resultType="int">
+		SELECT count(*)
+		FROM (
+			<include refid="search_query"></include>
+			<include refid="search_conditions"></include>
+		) A
+	</select>
+	
+	<select id="findOne" parameterType="HashMap" resultType="HashMap">
+		SELECT *
+		FROM (
+			<include refid="search_query"></include>
+			<include refid="search_conditions"></include>
+		) A
+	</select>
+	
+	<insert id="insert" parameterType="HashMap">
+		INSERT INTO PERSONGROUPTEAM (
+			RESPPARTYGROUP
+			, RESPPARTY
+			, PERSONGROUP
+			, RESPPARTYGROUPSEQ
+			, RESPPARTYSEQ
+			, USEFORORG
+			, USEFORSITE
+			, GROUPDEFAULT
+			, ORGDEFAULT
+			, SITEDEFAULT
+			, PERSONGROUPTEAMID
+		) VALUES 
+		<foreach collection="userList" item="user" separator="," index="index">
+			(
+				#{user.PERSONID}
+				, #{user.PERSONID}
+				, #{PERSONGROUP}
+				, #{index} + 1
+				, #{index} + 1
+				, NULL
+				, NULL
+				, CASE WHEN #{index} = 0 THEN 1 ELSE 0 END
+				, 0
+				, 0
+				, NEXTVAL FOR PERSONGROUPTEAMSEQ
+			)
+		</foreach>
+	</insert>
+	
+	<delete id="delete" parameterType="HashMap">
+		DELETE FROM PERSONGROUPTEAM
+		WHERE PERSONGROUP = #{PERSONGROUP}
+	</delete>
+	
+	<select id="findTowerGroupList" parameterType="HashMap" resultType="HashMap">
+		SELECT PERSONGROUP AS CODE_ID
+			, DESCRIPTION AS CODE_NM
+		FROM PERSONGROUP
+		WHERE HASLD = 1
+		ORDER BY PERSONGROUPID 
+	</select>
+	
+	<select id="findTowerGroupNmList" parameterType="HashMap" resultType="HashMap">
+		SELECT B.PERSONGROUP AS CODE_ID
+			, B.DESCRIPTION AS CODE_NM
+		FROM (
+			SELECT PERSONGROUP
+			FROM TABLE(VALUES 
+				<foreach collection="PERSONGROUP" item="group" separator=",">
+					'${group}'
+				</foreach>
+			) T1(PERSONGROUP)
+		) A, PERSONGROUP B
+		WHERE A.PERSONGROUP = B.PERSONGROUP 
+	</select>
+</mapper>

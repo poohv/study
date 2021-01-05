@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.kyobo.mapper.maximo.commonCode.CommonCodeMapper">
+	<sql id="search_query">
+		SELECT A.VALUE AS CODE_ID
+			, B.DESCRIPTION AS CODE_NM
+		FROM ALNDOMAIN A , L_ALNDOMAIN B
+		WHERE A.ALNDOMAINID = B.OWNERID
+	</sql>
+	<sql id="search_conditions">
+		<if test="DOMAINID != null and DOMAINID != ''">
+			AND A.DOMAINID = #{DOMAINID}
+		</if>
+		<if test="CODE_ID != null and CODE_ID != ''">
+			AND A.VALUE = #{CODE_ID}
+		</if>
+		<if test="CODE_NM != null and CODE_NM != ''">
+			AND UPPER(B.DESCRIPTION) LIKE '%' || UPPER(#{CODE_NM}) || '%'
+		</if>
+	</sql>
+	
+	<select id="findCodeList" parameterType="HashMap" resultType="HashMap">
+		SELECT *
+		FROM (
+			<include refid="search_query"></include>
+			<include refid="search_conditions"></include>
+			<if test="length!=null and !length.equals('')">
+				LIMIT ${length}
+				OFFSET ${start}
+			</if>
+		) AA
+	</select>
+	
+	<select id="findCodeListCount" parameterType="hashmap" resultType="int">
+		SELECT count(*)
+		FROM (
+			<include refid="search_query"></include>
+			<include refid="search_conditions"></include>
+		) AA
+	</select>
+	
+	<select id="findCode" parameterType="HashMap" resultType="HashMap">
+		SELECT *
+		FROM (
+			<include refid="search_query"></include>
+			<include refid="search_conditions"></include>
+		) AA
+	</select>
+	
+	<sql id="search_code_query">
+		SELECT A.DOMAINID 
+			, A.VALUE AS CODE_ID
+			, B.DESCRIPTION AS CODE_NM
+			, A.DOMAIN_SEQ
+		FROM ALNDOMAIN A , L_ALNDOMAIN B
+		WHERE A.ALNDOMAINID = B.OWNERID
+		AND A.DOMAINID = #{DOMAINID}
+	</sql>
+	
+	<sql id="code_query">
+		SELECT DISTINCT A.DOMAINID AS CODE_ID,
+		A.DOMAINID AS CODE_NM
+		FROM ALNDOMAIN A , L_ALNDOMAIN B
+		WHERE A.ALNDOMAINID = B.OWNERID
+		<if test="CODE_NM != null and CODE_NM != ''">
+			AND UPPER(A.DOMAINID) LIKE '%' || UPPER(#{CODE_NM}) || '%'
+		</if>
+		ORDER BY DOMAINID
+	</sql>
+	
+	<select id="findAll" parameterType="HashMap" resultType="HashMap">
+		SELECT *
+		FROM (
+			<include refid="search_code_query"></include>
+			<if test="length!=null and !length.equals('') and length > -1">
+				LIMIT ${length}
+				OFFSET ${start}
+			</if>
+			ORDER BY A.DOMAINID, A.DOMAIN_SEQ
+		) A
+	</select>
+	
+	<select id="findCount" parameterType="HashMap" resultType="int">
+		SELECT count(*)
+		FROM (
+			<include refid="search_code_query"></include>
+			<include refid="search_conditions"></include>
+			ORDER BY A.DOMAINID, A.DOMAIN_SEQ
+		) A
+	</select>
+	
+	<select id="findOne" parameterType="HashMap" resultType="HashMap">
+		SELECT *
+		FROM (
+			<include refid="search_code_query"></include>
+			<include refid="search_conditions"></include>
+		) A
+	</select>
+	
+	<update id="updateOrderNo" parameterType="HashMap">
+		UPDATE ALNDOMAIN SET
+			DOMAIN_SEQ = #{DOMAIN_SEQ}
+		WHERE VALUE	   = #{VALUE}	
+	</update>
+	
+	<select id="findList" parameterType="HashMap" resultType="HashMap">
+		SELECT *
+		FROM (
+			<include refid="code_query"></include>
+			<if test="length!=null and !length.equals('')">
+				LIMIT ${length}
+				OFFSET ${start}
+			</if>
+		) AA
+	</select>
+	
+	<select id="baseLineSeq" parameterType="HashMap" resultType="HashMap">
+		SELECT HIST_SEQ AS CODE_ID,
+		ROW_NUMBER() OVER() AS CODE_NM
+		FROM (
+			SELECT DISTINCT HIST_SEQ
+			FROM TB_BILL_BASElINE_HIST
+			WHERE 1=1
+			AND BASE_YN = 'N'
+		)
+	</select>
+	
+	<select id="rateSeq" parameterType="HashMap" resultType="HashMap">
+		SELECT HIST_SEQ AS CODE_ID,
+		ROW_NUMBER() OVER() AS CODE_NM
+		FROM (
+			SELECT DISTINCT HIST_SEQ
+			FROM TB_BILL_RATE_HIST
+			WHERE 1=1
+			AND BASE_YN = 'N'
+		)
+	</select>
+	
+	<select id="detailSeq" parameterType="HashMap" resultType="HashMap">
+		SELECT HIST_SEQ AS CODE_ID,
+		ROW_NUMBER() OVER() AS CODE_NM
+		FROM (
+			SELECT DISTINCT HIST_SEQ
+			FROM TB_BILL_DETAIL_HIST
+		)
+	</select>
+	
+	<select id="contractAmountSeq" parameterType="HashMap" resultType="HashMap">
+		SELECT HIST_SEQ AS CODE_ID,
+		ROW_NUMBER() OVER() AS CODE_NM
+		FROM (
+			SELECT DISTINCT HIST_SEQ
+			FROM TB_CONTRACT_AMOUNT_HIST
+		)
+	</select>
+	
+</mapper>

@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html layout:decorator="thymeleaf/layout/layout_blank">
+<head>
+	<title layout:title-pattern="$LAYOUT_TITLE : $CONTENT_TITLE">[(#{title.contract})]</title>
+</head>
+<body>
+
+	<div layout:fragment="content">
+		<div class="easyui-tabs easyui-tabs-sub" style="height: auto;"></div>
+	</div>
+
+	<th:block layout:fragment="script">
+		<script>
+			var tabsComp;
+			
+			$(function() {
+				tabsComp = $('.easyui-tabs');
+				
+				tabsComp.createTabs({
+					id: 'list',
+					title: '[(#{title.list})]',
+					isIframe: true,
+					url: _ctx + '/bill/contract/list',
+					method: 'add',
+					closable: false
+				});
+			});
+		</script>
+	</th:block>
+</body>
+</html>

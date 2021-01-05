@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html layout:decorator="thymeleaf/layout/layout_blank">
+<head>
+<title layout:title-pattern="$LAYOUT_TITLE : $CONTENT_TITLE">[(#{title.sr})] - [(#{title.update})]</title>
+</head>
+<body>
+
+	<div layout:fragment="content">
+		<section class="content">
+			<div class="container-fluid">
+				<div class="row mt-2">
+					<div class="col-lg-12">
+						<form id="input-form">
+							<div class="card card-primary card-outline">
+								<div class="card-header">
+									<h5 class="card-title m-0" data-th-text="#{title.sr.receive}"></h5>
+								</div>
+								<div class="card-body">
+									<div class="row">
+										<div class="col-sm-12">
+											<div class=" form-group">
+												<label for="PERSONGROUP">[(#{label.sr.receiveGroup})] <i class="fas fa-check text-danger"></i></label>
+												<select id="PERSONGROUP" name="PERSONGROUP"
+													class="form-control select2" multiple="multiple" disabled="disabled">
+												</select>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="card card-primary card-outline">
+								<div class="card-header">
+									<h5 class="card-title m-0" data-th-text="#{title.sr}"></h5>
+								</div>
+								<div class="card-body">
+									<div class="row">
+										<div class="col-sm-4">
+											<div class=" form-group">
+												<label for="REQ_USER_NM">[(#{label.sr.reqUserId})] <i class="fas fa-check text-danger"></i></label>
+												<input type="text" id="REQ_USER_ID" name="REQ_USER_ID" class="form-control" readonly="readonly">
+											</div>
+										</div>
+										<div class="col-sm-4">
+											<div class="form-group">
+												<label for="SR_ID">[(#{label.sr.srId})] <i class="fas fa-check text-danger"></i></label>
+												<input type="text" id="SR_ID" name="SR_ID" class="form-control" readonly="readonly" data-th-value="${SR_ID}">
+											</div>
+										</div>
+										<!-- <div class="col-sm-4">
+											<div class="form-group">
+												<label for="REQ_PHONE">[(#{label.sr.phone})] <i class="fas fa-check text-danger"></i></label>
+												<input type="text" id="REQ_PHONE" name="REQ_PHONE" class="form-control" readonly="readonly">
+											</div>
+										</div>
+										<div class="col-sm-4">
+											<div class="form-group">
+												<label for="REQ_EMAIL">[(#{label.sr.email})] <i class="fas fa-check text-danger"></i></label>
+												<input type="email" id="REQ_EMAIL" name="REQ_EMAIL" class="form-control" readonly="readonly">
+											</div>
+										</div> -->
+									</div>
+									<div class="row">
+										<div class="col-sm-12">
+											<div class=" form-group">
+												<label for="SR_TITLE">[(#{label.sr.srTitle})] <i class="fas fa-check text-danger"></i></label>
+												<input type="text" id="SR_TITLE" name="SR_TITLE" class="form-control" readonly="readonly">
+											</div>
+										</div>
+									</div>
+									<div class="row">
+										<div class="col-sm-4">
+											<div class=" form-group">
+												<label for="PRIORITY_CD">[(#{label.sr.priorityCd})] <i class="fas fa-check text-danger"></i></label>
+												<select id="PRIORITY_CD" name="PRIORITY_CD"
+													class="form-control select2" disabled="disabled">
+												</select>
+											</div>
+										</div>
+										<div class="col-sm-4">
+											<!-- text input -->
+											<div class="form-group">
+												<label for="REQ_DT">[(#{label.sr.presentation})] <i class="fas fa-check text-danger"></i></label>
+												<div class="input-group date" id="REQ_DT" data-target-input="nearest">
+							                        <input type="text" name="REQ_DT" class="form-control datetimepicker-input" data-toggle="datetimepicker" data-target="#REQ_DT" readonly="readonly">
+							                        <div class="input-group-append" data-target="#REQ_DT" data-toggle="datetimepicker">
+							                            <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+							                        </div>
+							                    </div>
+											</div>
+										</div>
+										<div class="col-sm-4">
+											<div class="form-group">
+												<label for="START_DT">[(#{label.sr.startDt})] <i class="fas fa-check text-danger"></i></label>
+												<div class="input-group date" id="START_DT" data-target-input="nearest">
+							                        <input type="text" name="START_DT" class="form-control datetimepicker-input" data-toggle="datetimepicker" data-target="#START_DT" readonly="readonly">
+							                        <div class="input-group-append" data-target="#START_DT" data-toggle="datetimepicker">
+							                            <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+							                        </div>
+							                    </div>
+											</div>
+										</div>
+									</div>
+									<div class="row">
+										<div class="col-sm-8">
+											<div class=" form-group">
+												<label for="REASON">[(#{label.sr.reason})] <i class="fas fa-check text-danger"></i></label>
+												<input type="text" id="REASON" name="REASON" class="form-control" readonly="readonly">
+											</div>
+										</div>
+										<div class="col-sm-4">
+											<div class=" form-group">
+												<label for="PROC_TYPE_CD">[(#{label.sr.procTypeCd})] <i class="fas fa-check text-danger"></i></label>
+												<select id="PROC_TYPE_CD" name="PROC_TYPE_CD" class="form-control select2">
+												</select>
+											</div>
+										</div>
+									</div>
+									<div class="row">
+										<div class="col-sm-12">
+											<div class="form-group">
+												<label for="ATTACH_FILE">[(#{label.sr.attach})]</label>
+												<input type="hidden" name="ATTACH_ID">
+												<table id="attachList" class="table table-striped table-sm table-bordered">
+													<thead>
+														<tr>
+															<th></th>
+															<th>#</th>
+															<th data-th-text="#{label.attach.fileName}"></th>
+															<th data-th-text="#{label.attach.size}"></th>
+														</tr>
+													</thead>
+												</table>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</form>
+						<form id="list-form">
+							<div class="card card-primary card-outline">
+								<div class="card-header">
+									<h5 class="card-title m-0" data-th-text="#{title.sr.detail}"></h5>
+								</div>
+								<div class="card-body">
+									<table id="dataTable" class="table nowrap table-sm table-bordered table-hover table-striped">
+										<thead>
+											<tr>
+												<th data-th-text="#{label.sr.baselineId}"></th>
+												<th data-th-text="#{label.sr.resourceCategory}"></th>
+												<th data-th-text="#{label.sr.quantity}"></th>
+												<th data-th-text="#{label.sr.remark}"></th>
+												<th data-th-text="#{label.sr.startDt}"></th>
+												<th data-th-text="#{label.sr.rateType}"></th>
+												<th data-th-text="#{label.sr.amount}"></th>
+												<th data-th-text="#{label.sr.procTypeCd}"></th>
+											</tr>
+										</thead>
+									</table>
+								</div>
+								<div class="card-footer">
+									<div class="row">
+										<div class="col-sm-12">
+											<div class="text-center">
+												<button type="button" class="btn btn-sm btn-primary" data-action-button="validate" data-th-text="#{button.update}"></button>
+												<button type="button" class="btn btn-sm btn-outline-primary" data-action-button="cancel" data-th-text="#{button.cancel}"></button>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</form>
+					</div>
+					<!-- /.col-lg-12 -->
+				</div>
+				<!-- /.row -->
+			</div>
+		</section>
+	</div>
+
+	<th:block layout:fragment="script">
+		<script>
+			$(function() {
+				var _SR_ID = '[(${SR_ID})]';
+				var form = $("#input-form");
+				var listForm = $("#list-form");
+				var validator = form.validate({
+					unhighlight: function (element, errorClass, validClass) {
+						$(element).removeClass('is-invalid');
+						
+						// 콤보
+						if ( $(element).hasClass( "select2" )) {
+							$(element).next().find('span span').removeClass('is-invalid');
+						}
+					}
+				});
+				
+				var listValidator = listForm.validate({
+					errorPlacement: function ( error, element ) {
+						error.addClass('invalid-feedback');
+					}
+				});
+				
+				// 수신 그룹
+				var personGroup = $('select[name="PERSONGROUP"]').createSelectBox({
+					url: _ctx + '/sr/srGroup/findTowerGroupList'
+				});
+				
+				// 우선순위
+				var priorityCd = $('select[name="PRIORITY_CD"]').createSelectBox({
+					code_id : 'PRIORITY'
+				});
+				
+				// 처리상태
+				$('select[name="PROC_TYPE_CD"]').createSelectBox({
+					code_id : 'PROC_TYPE'
+				});
+				
+				// 제출일
+				$('#REQ_DT').createDatePicker({
+					format: 'YYYY/MM/DD'
+				});
+				
+				// 개시요청일자
+				$('#START_DT').createDatePicker({
+					format: 'YYYY/MM/DD'
+				});
+				
+				// 수신자 목록 생성
+				var dataTableEmail = $('#dataTable-email').createDataTable({
+					bPaginate: false,
+					dom: 'frt',
+					columns: [
+						{data : "EMAIL_RECEIVE_TYPE_CD_NM"},
+						{data : "EMAIL"}
+					]
+				});
+				
+				// 첨부파일 목록 생성
+				var dataTableAttach = $('#attachList').createDataTable({
+					bPaginate: false,
+					dom: 'frt',
+					columns: [
+						{data : "ATTACH_ID", visible: false},
+						{data : "ORDER_NO"},
+						{data : "ORG_FILE_NAME"},
+						{data : "SIZE"}
+					],
+					columnDefs: [
+						{
+							targets: [1],
+							className: 'text-center',
+							render: function ( data, type, full, meta ) {
+								return data + 1;
+							}
+						},
+						{
+							targets: [2],
+							render: function ( data, type, full, meta ) {
+								var colContent = '';
+								colContent += '<a href="' + _ctx + '/attach/download?ATTACH_ID=' + full['ATTACH_ID'] + '&ORDER_NO=' + full['ORDER_NO'] + '">';
+								colContent += data;
+								colContent += '</a>';
+								
+								return colContent;
+							}
+						},
+						{
+							targets: [3],
+							render: function ( data, type, full, meta ) {
+								return data + 'KB';
+							}
+						}
+					]
+				});
+				
+				// 조회결과 테이블 생성
+				var dataTable = $('#dataTable').createDataTable({
+					bPaginate: false,
+					dom: 'ifrt',
+					columns: [
+						{data : "BASELINE_ID"},
+						{data : "RESOURCE_CATEGORY_CD_NM"},
+						{data : "QUANTITY"},
+						{data : "REMARK"},
+						{data : "START_DT"},
+						{data : "RATE_TYPE_CD_NM"},
+						{data : "AMOUNT"},
+						{data : "PROC_TYPE_CD"}
+					],
+					columnDefs: [
+						{
+							targets: [0],
+							visible: false
+						},
+						{
+							targets: [2],
+							className: 'text-right',
+							render: function ( data, type, full, meta ) {
+								var colContent = '';
+								colContent += data + ' ' + full['UNITS'];
+								return colContent;
+							}
+						},
+						{
+							targets: [3],
+							render: function ( data, type, full, meta ) {
+								return data.replace(/(\n|\r\n)/g, '<br>');
+							}
+						},
+						{
+							targets: [6],
+							className: 'text-right'
+						},
+						{
+							targets: [7],
+							render: function ( data, type, full, meta ) {
+								var colContent = '';
+								colContent += '<select name="PROC_TYPE_CD" class="form-control" required="required">';
+								colContent += '</select>';
+								
+								$.setComboData({
+									id: 'PROC_TYPE_CD',
+									meta: meta,
+									selVal: full['PROC_TYPE_CD'],
+									url: '/api/code/PROC_TYPE'
+								});
+								
+								return colContent;
+							}
+						}
+					]
+				});
+				
+				// 요청 상세 콤보 데이터 셋팅
+				$.setComboData = function(options) {
+					var _td = $('#dataTable').DataTable().cell(options['meta'].row, options['meta'].col).nodes();
+					var _data = options['data'];
+					var _selVal = options['selVal'];
+					
+					$.sendData({
+						url: options['url'],
+						data: _data
+					}, function(data) {
+						var optionsHtml = '';
+						var selected = '';
+						
+						for(var i=0; i<data.length; i++) {
+							if(data[i]['CODE_ID'] == _selVal) {
+								selected = 'selected';
+							} else {
+								selected = '';
+							}
+							
+							optionsHtml += '<option value="' + data[i]['CODE_ID'] + '" ' + selected + '>' + data[i]['CODE_NM'] + '</option>';
+						}
+						
+						var _select = $(_td).find('select');
+						
+						$(_select).html(optionsHtml).select2({width: '100%'});
+					});
+				};
+				
+				// 프로세스 처리 함수
+				$.fn.executeAction = function(procType) {
+					switch(procType) {
+						case 'search' :		// 데이터 조회
+							// 요청정보 조회
+							$.sendData({
+								url: '/sr/sr/findData',
+								async: false,
+								data: {SR_ID: _SR_ID},
+							}, function(data) {
+								form.find('[name="REQ_USER_ID"]').val(data['REQ_USER_ID']);
+								form.find('[name="REQ_PHONE"]').val(data['REQ_PHONE']);
+								form.find('[name="REQ_EMAIL"]').val(data['REQ_EMAIL']);
+								form.find('[name="SR_TITLE"]').val(data['SR_TITLE']);
+								form.find('[name="SR_ID"]').val(data['SR_ID']);
+								form.find('[name="PRIORITY_CD"]').append(new Option(data['PRIORITY_CD_NM'], data['PRIORITY_CD'], true, true)).trigger('change');
+								form.find('[name="REQ_DT"]').val(data['REQ_DT']);
+								form.find('[name="START_DT"]').val(data['START_DT']);
+								form.find('[name="REASON"]').val(data['REASON']);
+								form.find('[name="PROC_TYPE_CD"]').append(new Option(data['PROC_TYPE_CD_NM'], data['PROC_TYPE_CD'], true, true)).trigger('change');
+								form.find('[name="ATTACH_ID"]').val(data['ATTACH_ID']);
+								
+								// 수신그룹 조회
+								if(data['PERSONGROUP']) {
+									$.sendData({
+										url: '/sr/srGroup/findTowerGroupNmList',
+										data: {PERSONGROUP: data['PERSONGROUP'].split(',')},
+									}, function(data) {
+										var options = '';
+										var selValArr = [];
+										
+										for(var i=0; i<data.length; i++) {
+											selValArr.push(data[i].CODE_ID);
+											options += '<option value="' + data[i].CODE_ID + '">' + data[i].CODE_NM + '</option>';
+										}
+										
+										$('select[name="PERSONGROUP"]').html(options);
+										$('select[name="PERSONGROUP"]').val(selValArr).change();
+									});
+								}
+							});
+							
+							// 첨부파일 조회
+							$.sendData({
+								url: '/attach/dataList',
+								data: {ATTACH_ID: form.find('[name="ATTACH_ID"]').val()}
+							}, function(data) {
+								dataTableAttach.rows.add(data).draw();
+							});
+							
+							// 요청상세 조회
+							$.sendData({
+								url: '/sr/sr/findDetailList',
+								data: {SR_ID: _SR_ID},
+							}, function(data) {
+								dataTable.rows.add(data).draw();
+							});
+						
+							break;
+						case 'validate' :	// 정합성 체크
+							//if(listForm.valid() && form.valid()) {
+								$.fn.executeAction('regist');
+							//}
+							
+							break;
+						case 'regist' :		// 등록
+							var formData = {};
+						
+							// 요청정보 입력 체크
+							if(!form.valid()) return false;
+							
+							var isValidDetail = true;
+							
+							// 요청상세 입력 체크
+							$(listForm).find('input, select').each(function(i) {
+								if(!$(this).valid()) {
+									isValidDetail = false;
+								}
+							});
+							
+							if(!isValidDetail) return false;
+							
+							$(form).serializeArray().map(function(x) {formData[x.name] = x.value;});
+							
+							var listDataArr = [];
+							
+							$('#dataTable tbody tr').each(function(i) {
+								var rowMap = dataTable.row(i).data();
+								
+								rowMap['PROC_TYPE_CD'] = $(this).find('[name="PROC_TYPE_CD"]').val();
+								
+								listDataArr.push(rowMap);
+							});
+							
+							formData['detailList'] = listDataArr;
+							
+							// 요청상세 입력 체크
+							if(formData['detailList'].length == 0) {
+								$.showAlert({
+									type: 'error',
+									msg: '[(#{msg.sr.no.detail})]'
+								});
+								return false;
+							}
+							
+							// 폼 데이터 전송
+							$.sendData({
+								url: '/sr/sr/updateData',
+								data: formData,
+								notification: true,
+								isIframe: true
+							}, function(data) {
+								if(data.result == 'S') {
+									parent.$('#list').get(0).contentWindow.location.reload();
+									
+									$.fn.executeAction('cancel');
+								}
+							});
+							
+							break;
+						case 'cancel' :		// 취소
+							var activeTab = parent.tabsComp.tabs('getSelected');
+							var activeIdx = parent.tabsComp.tabs('getTabIndex', activeTab);
+							parent.tabsComp.tabs('close', activeIdx);
+							
+							break;
+						default :
+							;
+					}
+				}
+				
+				// 버튼 이벤트
+				$('[data-action-button]').on('click', function() {
+					$(this).executeAction($(this).data('action-button'));
+				});
+				
+				$.fn.executeAction('search');
+			});
+		</script>
+	</th:block>
+</body>
+</html>

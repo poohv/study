@@ -1,0 +1,101 @@
+package kr.co.kyobo.config;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.mail.MessagingException;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.stereotype.Component;
+import org.thymeleaf.context.Context;
+import org.thymeleaf.spring5.SpringTemplateEngine;
+
+import kr.co.kyobo.common.service.AttachService;
+import kr.co.kyobo.sr.srGroup.service.SrGroupService;
+
+@Component
+public class CustomMailSender {
+	@Autowired
+	private JavaMailSender javaMailSender;
+	
+	@Autowired
+	private AttachService attachService;
+	
+	@Autowired
+	private SrGroupService srGroupService;
+	
+	@Autowired
+	private SpringTemplateEngine templeteEngine;
+	
+	public void sendSRMail(Map<String, Object> srData) throws MessagingException, IOException {
+		MimeMessage message = javaMailSender.createMimeMessage();
+		MimeMessageHelper helper = new MimeMessageHelper(message, true);
+		Map<String, Object> conditions = new HashMap<String, Object>();
+		
+		// 발신자
+		conditions.clear();
+		conditions.put("PERSONGROUP", "ITO_FROM");
+		conditions.put("GROUPDEFAULT", "1");
+		
+		Map<String, Object> fromMap = srGroupService.findOne(conditions);
+		InternetAddress fromAddr = new InternetAddress();
+		fromAddr.setAddress(fromMap.get("EMAILADDRESS").toString());
+		fromAddr.setPersonal(srData.get("REQ_USER_NM").toString(), "UTF-8");
+		helper.setFrom(fromAddr);
+		
+		// 수신자
+		List<InternetAddress> toEmalList = new ArrayList<InternetAddress>();
+		String[] groupArr = srData.get("PERSONGROUP").toString().split(",");
+		
+		for (String group : groupArr) {
+			conditions.clear();
+			conditions = new HashMap<String, Object>();
+			conditions.put("PERSONGROUP", group);
+			
+			List<Map<String, Object>> toList = srGroupService.findAll(conditions);
+			
+			for (Map<String, Object> toMap : toList) {
+				toEmalList.add(new InternetAddress(toMap.get("EMAILADDRESS").toString()
+						, toMap.get("DISPLAYNAME").toString()));
+			}
+		}
+		
+		InternetAddress[] toArr = new InternetAddress[toEmalList.size()];
+		
+		for (int i=0; i<toEmalList.size(); i++) {
+			toArr[i] = toEmalList.get(i);
+		}
+		
+		// 수신자가 있을 경우 전송
+		if(toArr.length > 0) {
+			helper.setTo(toArr);
+					
+			// 제목
+			helper.setSubject(srData.get("SR_TITLE").toString());
+			
+			// 템플릿 전달 데이터
+			Context context = new Context(null, srData);
+			
+			// 메일 내용 템플릿
+			String html = templeteEngine.process("mail-template-sr", context);
+			helper.setText(html, true);
+			
+			// 첨부파일
+			List<Map<String, Object>> attachList = attachService.findAll(srData);
+			for (Map<String, Object> map : attachList) {
+				helper.addAttachment(map.get("ORG_FILE_NAME").toString(), new File(map.get("PATH").toString()));
+			}
+			
+			// 메일 전송
+			javaMailSender.send(message);
+		}
+	}
+}

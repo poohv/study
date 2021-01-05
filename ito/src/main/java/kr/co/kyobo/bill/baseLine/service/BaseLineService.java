@@ -1,0 +1,43 @@
+package kr.co.kyobo.bill.baseLine.service;
+
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import kr.co.kyobo.mapper.maximo.bill.BaseLineMapper;
+
+@Service
+public class BaseLineService {
+	
+	@Autowired
+	public BaseLineMapper baseLineMapper;
+	
+	public int findCount(Map<String, Object> params) {
+		return baseLineMapper.findCount(params);
+	}
+	
+	public List<Map<String, Object>> findAll(Map<String, Object> params) {
+		return baseLineMapper.findAll(params);
+	}
+	
+	public Map<String, Object> findOne(Map<String, Object> params) {
+		return baseLineMapper.findOne(params);
+	}
+	
+	public int insert(Map<String, Object> insertData) {
+		int resultCnt = 0;
+		
+		// 이력 저장
+		resultCnt += baseLineMapper.insertHist(insertData);
+		
+		// 기존 데이터 삭제
+		resultCnt += baseLineMapper.delete(insertData);
+		
+		// 데이터 저장
+		resultCnt += baseLineMapper.insert(insertData);
+		
+		return resultCnt;
+	}
+}

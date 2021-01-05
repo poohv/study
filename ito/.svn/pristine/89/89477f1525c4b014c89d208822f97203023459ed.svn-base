@@ -1,0 +1,14 @@
+########## 과금 세부내역 업로드 ##########
+excel.bill.json.output.path=D:/ITO/
+excel.bill.json.output.filename=kbl_billing_report
+excel.bill.json.elk.path=/etc/logstash/data
+
+excel.bill.sheet.name=세부내역
+excel.bill.sheet.header.rownum=1
+excel.bill.sheet.target.check.header=S/T
+excel.bill.sheet.target.check.type=T
+excel.bill.header=사용량,요율,할인율,서비스일수,전월일수,금액,내용,계약구분,계약번호,금액구분,KBLI Tower,Baseline ID,SA&D Date,SA&D Seq,월사용량(RU)
+excel.bill.column=USAGE,RATE,APPLY_RATE,SERVICE_DAYS,DAYS,AMOUNT,REMARK,CONTRACT_TYPE_CD,CONTRACT_NO,CHARGE_TYPE_CD,TOWER_TYPE_CD,BASELINE_ID,SERVICE_APPLY_DATE,SERVICE_APPLY_SEQ,USAGE_TPMC
+excel.bill.type=double,double,double,double,double,double,text,domain,text,domain,domain,text,text,text,double
+excel.bill.required=false,false,false,false,false,false,false,true,true,true,true,true,true,true,false
+excel.bill.conditions.required=USAGE,RATE,APPLY_RATE,SERVICE_DAYS,DAYS

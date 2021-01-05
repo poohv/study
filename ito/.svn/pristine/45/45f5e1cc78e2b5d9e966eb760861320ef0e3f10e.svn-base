@@ -1,0 +1,282 @@
+<html>
+
+<!--menuFragment 선언-->
+<div th:fragment="menuFragment">
+	<!-- Main Sidebar Container -->
+	<aside class="main-sidebar sidebar-dark-primary elevation-4">
+		<!-- Brand Logo -->
+		<a th:href="@{/main}" class="brand-link elevation-4"> <img
+			th:src="@{/adminlte/dist/img/logo.png}" alt="[(#{title.logo})]"
+			class="brand-image">
+			<span class="brand-text font-weight-bold">[(#{title.logo})]</span>
+		</a>
+		
+		<!-- Sidebar -->
+		<div class="sidebar">
+			<!-- Sidebar Menu -->
+			<nav class="mt-2">
+				<ul class="nav nav-pills nav-sidebar flex-column nav-child-indent" data-widget="treeview" role="menu" data-accordion="false">
+					<li class="nav-header">과금</li>
+					<li class="nav-item has-treeview menu-open">
+						<a href="#" class="nav-link">
+							<i class="nav-icon fas fa-file-contract"></i>
+							<p>
+								계약 <i class="right fas fa-angle-left"></i>
+							</p>
+						</a>
+						<ul class="nav nav-treeview">
+							<li class="nav-item">
+								<a href="#" data-menu-id="contract" data-menu-url="/bill/contract/index" class="nav-link">
+									<i class="far fa-circle nav-icon"></i>
+									<p>계약관리</p>
+								</a>
+							</li>
+							<li class="nav-item">
+								<a href="#" data-menu-id="contract-amount" data-menu-url="/bill/contractAmount/index" class="nav-link">
+									<i class="far fa-circle nav-icon"></i>
+									<p>계약금액 관리</p>
+								</a>
+							</li>
+						</ul>
+					</li>
+					<li class="nav-item has-treeview">
+						<a href="#" class="nav-link">
+							<i class="nav-icon fas fa-edit"></i>
+							<p>
+								베이스라인 <i class="right fas fa-angle-left"></i>
+							</p>
+						</a>
+						<ul class="nav nav-treeview">
+							<li class="nav-item">
+								<a href="#" data-menu-id="bill-resource" data-menu-url="/bill/resource/index" class="nav-link">
+									<i class="far fa-circle nav-icon"></i>
+									<p>리소스 관리</p>
+								</a>
+							</li>
+							<li class="nav-item">
+								<a href="#" data-menu-id="bill-baseline" data-menu-url="/bill/baseLine/index" class="nav-link">
+									<i class="far fa-circle nav-icon"></i>
+									<p>베이스라인 관리</p>
+								</a>
+							</li>
+							<li class="nav-item">
+								<a href="#" data-menu-id="bill-rate" data-menu-url="/bill/rate/index" class="nav-link">
+									<i class="far fa-circle nav-icon"></i>
+									<p>요율 관리</p>
+								</a>
+							</li>
+						</ul>
+					</li>
+					<li class="nav-item has-treeview">
+						<a href="#" class="nav-link">
+							<i class="nav-icon fas fa-list-ol"></i>
+							<p>
+								세부내역 <i class="right fas fa-angle-left"></i>
+							</p>
+						</a>
+						<ul class="nav nav-treeview">
+							<li class="nav-item">
+								<a href="#" data-menu-id="bill-detail" data-menu-url="/bill/detail/index" class="nav-link">
+									<i class="far fa-circle nav-icon"></i>
+									<p>세부내역 관리</p>
+								</a>
+							</li>
+						</ul>
+					</li>
+					<li class="nav-item has-treeview">
+						<a href="#" class="nav-link">
+							<i class="nav-icon fas fa-cog"></i>
+							<p>
+								공통 <i class="right fas fa-angle-left"></i>
+							</p>
+						</a>
+						<ul class="nav nav-treeview">
+							<li class="nav-item">
+								<a href="#" data-menu-id="common-code" data-menu-url="/api/code/common/code/index" class="nav-link">
+									<i class="far fa-circle nav-icon"></i>
+									<p>코드 관리</p>
+								</a>
+							</li>
+							<li class="nav-item">
+								<a href="#" data-menu-id="user-role" data-menu-url="/user/role/index" class="nav-link">
+									<i class="far fa-circle nav-icon"></i>
+									<p>사용자 권한 관리</p>
+								</a>
+							</li>
+						</ul>
+					</li>
+					<li class="nav-item has-treeview">
+						<a href="#" class="nav-link">
+							<i class="nav-icon fas fa-history"></i>
+							<p>
+								이력 관리 <i class="right fas fa-angle-left"></i>
+							</p>
+						</a>
+						<ul class="nav nav-treeview">
+							<li class="nav-item">
+								<a href="#" data-menu-id="contract-hist" data-menu-url="/hst/contractAmountHst/index" class="nav-link">
+									<i class="far fa-circle nav-icon"></i>
+									<p>계약금액 이력조회</p>
+								</a>
+							</li>
+							<li class="nav-item">
+								<a href="#" data-menu-id="baseline-hist" data-menu-url="/hst/baseLineHst/index" class="nav-link">
+									<i class="far fa-circle nav-icon"></i>
+									<p>베이스라인 이력조회</p>
+								</a>
+							</li>
+							<li class="nav-item">
+								<a href="#" data-menu-id="rate-hist" data-menu-url="/hst/rateHst/index" class="nav-link">
+									<i class="far fa-circle nav-icon"></i>
+									<p>요율 이력조회</p>
+								</a>
+							</li>
+							<li class="nav-item">
+								<a href="#" data-menu-id="detail-hist" data-menu-url="/hst/detailHst/index" class="nav-link">
+									<i class="far fa-circle nav-icon"></i>
+									<p>세부내역 이력조회</p>
+								</a>
+							</li>
+						</ul>
+					</li>
+					<!-- <li class="nav-header">타워</li>
+					<li class="nav-item has-treeview">
+						<a href="#" class="nav-link">
+							<i class="nav-icon fas fa-chart-pie"></i>
+							<p>
+								타워별 집계 <i class="right fas fa-angle-left"></i>
+							</p>
+						</a>
+						<ul class="nav nav-treeview">
+							<li class="nav-item">
+								<a href="#" data-menu-id="contract-1" data-menu-url="/bill/contract" class="nav-link">
+									<i class="far fa-circle nav-icon"></i>
+									<p>tpmC관리</p>
+								</a>
+							</li>
+							<li class="nav-item">
+								<a href="#" data-menu-id="contract-1" data-menu-url="/bill/contract" class="nav-link">
+									<i class="far fa-circle nav-icon"></i>
+									<p>서버</p>
+								</a>
+							</li>
+							<li class="nav-item">
+								<a href="#" data-menu-id="contract-1" data-menu-url="/bill/contract" class="nav-link">
+									<i class="far fa-circle nav-icon"></i>
+									<p>네트워크</p>
+								</a>
+							</li>
+							<li class="nav-item">
+								<a href="#" data-menu-id="contract-1" data-menu-url="/bill/contract" class="nav-link">
+									<i class="far fa-circle nav-icon"></i>
+									<p>스토리지</p>
+								</a>
+							</li>
+						</ul>
+						</li>
+						<li class="nav-item has-treeview">
+						<a href="#" class="nav-link">
+							<i class="nav-icon fas fa-edit"></i>
+							<p>
+								타워별 현황관리 <i class="right fas fa-angle-left"></i>
+							</p>
+						</a>
+						<ul class="nav nav-treeview">
+							<li class="nav-item">
+								<a href="#" data-menu-id="tower-1" data-menu-url="/tower/group/index" class="nav-link">
+									<i class="far fa-circle nav-icon"></i>
+									<p>업무그룹 관리</p>
+								</a>
+							</li>
+							<li class="nav-item">
+								<a href="#" data-menu-id="tower-2" data-menu-url="/tower/ignore/index" class="nav-link">
+									<i class="far fa-circle nav-icon"></i>
+									<p>성능집계 예외일자 관리</p>
+								</a>
+							</li>
+							<li class="nav-item">
+								<a href="#" data-menu-id="tower-3" data-menu-url="/tower/contract" class="nav-link">
+									<i class="far fa-circle nav-icon"></i>
+									<p>네트워크 변경관리</p>
+								</a>
+							</li>
+							<li class="nav-item">
+								<a href="#" data-menu-id="tower-4" data-menu-url="/tower/contract" class="nav-link">
+									<i class="far fa-circle nav-icon"></i>
+									<p>스토리지 변경관리</p>
+								</a>
+							</li>
+							<li class="nav-item">
+								<a href="#" data-menu-id="tower-5" data-menu-url="/tower/contract" class="nav-link">
+									<i class="far fa-circle nav-icon"></i>
+									<p>월별 서버 TPMC</p>
+								</a>
+							</li>
+							<li class="nav-item">
+								<a href="#" data-menu-id="tower-6" data-menu-url="/tower/contract" class="nav-link">
+									<i class="far fa-circle nav-icon"></i>
+									<p>일별 서버 TPMC 현황</p>
+								</a>
+							</li>
+						</ul>
+					</li> -->
+					<li class="nav-header">서비스 요청</li>
+					<li class="nav-item has-treeview">
+						<a href="#" class="nav-link">
+							<i class="nav-icon fas fa-edit"></i>
+							<p>
+								서비스 요청 <i class="right fas fa-angle-left"></i>
+							</p>
+						</a>
+						<ul class="nav nav-treeview">
+							<li class="nav-item">
+								<a href="#" data-menu-id="sr-group" data-menu-url="/sr/srGroup/index" class="nav-link">
+									<i class="far fa-circle nav-icon"></i>
+									<p>서비스 요청 수신그룹</p>
+								</a>
+							</li>
+							<li class="nav-item">
+								<a href="#" data-menu-id="sr" data-menu-url="/sr/sr/index" class="nav-link">
+									<i class="far fa-circle nav-icon"></i>
+									<p>서비스 요청</p>
+								</a>
+							</li>
+						</ul>
+					</li>
+					<li class="nav-item has-treeview">
+						<a href="#" class="nav-link">
+							<i class="nav-icon fas fa-edit"></i>
+							<p>
+								Billing DashBoard <i class="right fas fa-angle-left"></i>
+							</p>
+						</a>
+						<ul class="nav nav-treeview">
+							<li class="nav-item">
+								<a href="#" data-menu-id="sr-group" data-menu-url="/bd/month/index" class="nav-link">
+									<i class="far fa-circle nav-icon"></i>
+									<p>월별 현황</p>
+								</a>
+							</li>
+							<li class="nav-item">
+								<a href="#" data-menu-id="sr" data-menu-url="/bd/daily/index" class="nav-link">
+									<i class="far fa-circle nav-icon"></i>
+									<p>기간별 현황</p>
+								</a>
+							</li>
+							<li class="nav-item">
+								<a href="#" data-menu-id="sr" data-menu-url="/bd/ar/index" class="nav-link">
+									<i class="far fa-circle nav-icon"></i>
+									<p>arc/rrc 현황</p>
+								</a>
+							</li>
+						</ul>
+					</li>
+				</ul>
+			</nav>
+			<!-- /.sidebar-menu -->
+		</div>
+		<!-- /.sidebar -->
+	</aside>
+</div>
+
+</html>

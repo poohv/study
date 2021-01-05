@@ -1,0 +1,37 @@
+{
+	"folders": {},
+	"connections": {
+		"db2-17302dbab5f-31a462dc34fba932": {
+			"provider": "db2",
+			"driver": "db2",
+			"name": "maxdb76",
+			"save-password": true,
+			"show-system-objects": true,
+			"read-only": false,
+			"configuration": {
+				"host": "10.33.6.250",
+				"port": "50005",
+				"database": "maxdb76",
+				"url": "jdbc:db2://10.33.6.250:50005/maxdb76",
+				"type": "dev",
+				"provider-properties": {
+					"@dbeaver-trace.enabled": "false",
+					"@dbeaver-trace.file": "trace",
+					"@dbeaver-trace.append": "false",
+					"@dbeaver-trace.level": "0"
+				},
+				"auth-model": "native"
+			}
+		}
+	},
+	"connection-types": {
+		"dev": {
+			"name": "Development",
+			"color": "255,255,255",
+			"description": "Regular development database",
+			"auto-commit": false,
+			"confirm-execute": false,
+			"confirm-data-change": false
+		}
+	}
+}

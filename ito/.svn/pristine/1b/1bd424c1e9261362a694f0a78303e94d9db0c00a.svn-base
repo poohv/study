@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.kyobo.mapper.maximo.bill.RateMapper">
+	<sql id="search_query">
+		SELECT CONTRACT_TYPE_CD
+			, CONTRACT_NO
+			, BASELINE_ID
+			, RATE_TYPE_CD
+			, RATE
+			, BASE_YN
+			, SVC_MONTH
+		FROM TB_BILL_RATE
+		WHERE CONTRACT_TYPE_CD = #{CONTRACT_TYPE_CD}
+		AND CONTRACT_NO = #{CONTRACT_NO}
+		AND BASELINE_ID = #{BASELINE_ID}
+		AND RATE_TYPE_CD = #{RATE_TYPE_CD}
+		AND BASE_YN = #{BASE_YN}
+	</sql>
+	<select id="findAll" parameterType="HashMap" resultType="HashMap">
+		WITH MONTH_RANGE(CONTRACT_MONTHS) AS (
+			SELECT DATE(TO_DATE(START_DATE, 'YYYYMMDD')) AS CONTRACT_MONTHS
+			FROM TB_CONTRACT
+			WHERE CONTRACT_TYPE_CD = #{CONTRACT_TYPE_CD}
+			AND CONTRACT_NO = #{CONTRACT_NO}
+			UNION ALL
+			SELECT DATE(CONTRACT_MONTHS) + 1 MONTH AS CONTRACT_MONTHS 
+			FROM MONTH_RANGE
+			WHERE CONTRACT_MONTHS <![CDATA[<=]]> (
+				SELECT DATE(TO_DATE(END_DATE, 'YYYYMMDD')) - 1 MONTH
+				FROM TB_CONTRACT
+				WHERE CONTRACT_TYPE_CD = #{CONTRACT_TYPE_CD}
+				AND CONTRACT_NO = #{CONTRACT_NO}
+			)
+		)
+		SELECT VARCHAR_FORMAT(CONTRACT_MONTHS, 'YYYY/MM') AS SVC_MONTH
+			, B.CONTRACT_TYPE_CD
+			, FN_GET_CODE_NM('CONTRACT_TYPE', #{CONTRACT_TYPE_CD}) AS CONTRACT_TYPE_CD_NM
+			, COALESCE(B.CONTRACT_NO, '') AS CONTRACT_NO
+			, B.BASELINE_ID
+			, FN_GET_RESOURCE_CATEGORY_NM('RESOURCE_CATEGORY', #{BASELINE_ID}) AS RESOURCE_CATEGORY_CD_NM
+			, B.RATE_TYPE_CD
+			, FN_GET_CODE_NM('RATE_TYPE', #{RATE_TYPE_CD}) AS RATE_TYPE_CD_NM
+			, RATE
+			, B.BASE_YN
+			, FN_GET_CODE_NM('RATE_TYPE', #{BASE_YN}) AS BASE_YN_NM
+		FROM MONTH_RANGE A, (
+			<include refid="search_query"></include>
+		) B
+		WHERE VARCHAR_FORMAT(A.CONTRACT_MONTHS, 'YYYYMM') = B.SVC_MONTH(+)
+	</select>
+	
+	<select id="findCount" parameterType="HashMap" resultType="int">
+		SELECT count(*)
+		FROM (
+			<include refid="search_query"></include>
+		) A
+	</select>
+	
+	<select id="findAmount" parameterType="HashMap" resultType="integer">
+		SELECT COALESCE(RATE, 0) * CAST(#{QUANTITY} AS INT)
+		FROM TB_BILL_RATE
+		WHERE BASE_YN =  COALESCE((
+			SELECT BASE_YN 
+			FROM TB_BILL_RATE
+			WHERE BASE_YN = 'N'
+			AND BASELINE_ID = #{BASELINE_ID}
+			AND CONTRACT_TYPE_CD = #{CONTRACT_TYPE_CD}
+			AND CONTRACT_NO = #{CONTRACT_NO}
+			AND RATE_TYPE_CD = #{RATE_TYPE_CD}
+			AND SVC_MONTH = SUBSTRING(REPLACE(#{START_DT}, '/', ''), 1, 6)
+		), 'Y')
+		AND BASELINE_ID = #{BASELINE_ID}
+		AND CONTRACT_TYPE_CD = #{CONTRACT_TYPE_CD}
+		AND CONTRACT_NO = #{CONTRACT_NO}
+		AND RATE_TYPE_CD = #{RATE_TYPE_CD}
+		AND SVC_MONTH = SUBSTRING(REPLACE(#{START_DT}, '/', ''), 1, 6)
+	</select>
+	
+	<insert id="insert" parameterType="HashMap">
+		INSERT INTO TB_BILL_RATE (
+			TB_BILL_RATEID
+			, CONTRACT_TYPE_CD
+			, CONTRACT_NO
+			, BASELINE_ID
+			, SVC_MONTH
+			, RATE
+			, RATE_TYPE_CD
+			, BASE_YN
+			, REG_USER_ID
+			, REG_DT
+		) VALUES 
+		<foreach collection="rateList" item="rate" separator=",">
+			(
+				NEXTVAL FOR TB_BILL_RATEIDSEQ
+				, #{rate.CONTRACT_TYPE_CD}
+				, #{rate.CONTRACT_NO}
+				, #{rate.BASELINE_ID}
+				, REPLACE(#{rate.SVC_MONTH}, '/', '')
+				, CASE WHEN '' = REPLACE(#{rate.RATE}, ',', '') THEN '0' 
+					ELSE REPLACE(#{rate.RATE}, ',', '')
+					END
+				, #{rate.RATE_TYPE_CD}
+				, #{rate.BASE_YN}
+				, #{rate.REG_USER_ID}
+				, CURRENT TIMESTAMP
+			)
+		</foreach>
+	</insert>
+	
+	<delete id="delete" parameterType="HashMap">
+		DELETE FROM TB_BILL_RATE
+		WHERE CONTRACT_TYPE_CD = #{CONTRACT_TYPE_CD}
+		AND CONTRACT_NO = #{CONTRACT_NO}
+		AND BASELINE_ID = #{BASELINE_ID}
+		AND RATE_TYPE_CD = #{RATE_TYPE_CD}
+		AND BASE_YN = #{BASE_YN}
+	</delete>
+	
+	<insert id="insertHist" parameterType="HashMap">
+		INSERT INTO TB_BILL_RATE_HIST (
+			TB_BILL_RATE_HISTID
+			, HIST_SEQ
+			, CONTRACT_TYPE_CD
+			, CONTRACT_NO
+			, BASELINE_ID
+			, SVC_MONTH
+			, RATE
+			, RATE_TYPE_CD
+			, BASE_YN
+			, REG_USER_ID
+			, REG_DT
+		)
+		SELECT NEXTVAL FOR TB_BILL_RATE_HISTIDSEQ
+			, (
+				SELECT COALESCE(MAX(HIST_SEQ), 0) + 1
+				FROM TB_BILL_RATE_HIST
+				WHERE CONTRACT_TYPE_CD = #{CONTRACT_TYPE_CD}
+				AND CONTRACT_NO = #{CONTRACT_NO}
+				AND BASELINE_ID = #{BASELINE_ID}
+				AND RATE_TYPE_CD = #{RATE_TYPE_CD}
+			)
+			, CONTRACT_TYPE_CD
+			, CONTRACT_NO
+			, BASELINE_ID
+			, SVC_MONTH
+			, RATE
+			, RATE_TYPE_CD
+			, BASE_YN
+			, #{REG_USER_ID}
+			, CURRENT TIMESTAMP
+		FROM TB_BILL_RATE
+		WHERE CONTRACT_TYPE_CD = #{CONTRACT_TYPE_CD}
+		AND CONTRACT_NO = #{CONTRACT_NO}
+		AND BASELINE_ID = #{BASELINE_ID}
+		AND RATE_TYPE_CD = #{RATE_TYPE_CD}
+		AND BASE_YN = #{BASE_YN}
+	</insert>
+</mapper>

@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge;">
+	<meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
+	<title>[(#{title.sr})]</title>
+	<style type="text/css">
+		/*************************** Common CSS  ***************************/
+		body,html{width:100%; height:100%; margin:0; padding:0; font-family:"Noto Sans KR", Nanum Barun Gothic, NanumGothic, malgun gothic, dotum, sans-serif; letter-spacing:-0.5px; font-size:13px; line-height:1.5; color:#626366; -webkit-print-color-adjust:exact; }
+		body{background-color:#ffffff; }
+		*{-webkit-text-size-adjust:none; -webkit-box-sizing:border-box; -moz-box-sizing:border-box; box-sizing:border-box; }
+		body,div,h1,h2,h3,h4,h5,h6,p,table,tr,th,td{margin:0; padding:0; }
+		.t_center{text-align:center !important;}
+		.t_right{text-align:right !important;}
+		.fs_18{font-size:18px;}
+		.ptlf24{padding-top:24px;padding-bottom:24px;}
+		.pd32{padding:32px;}
+		
+		/* ***************************  Table css *************************** */
+		.wrap {
+		  max-width: 950px;
+		  margin: 0 auto;
+		}
+		
+		.wrap .table table {
+		  border-top: 2px solid #626366;
+		}
+		
+		.wrap .table table tbody tr th,
+		.wrap .table table tbody tr td {
+		  padding: 8px 0px 8px 10px;
+		  text-align: left;
+		}
+		
+		.wrap table {
+		  width: 100%;
+		  empty-cells: show;
+		  border-collapse: collapse;
+		  border-spacing: 0;
+		  table-layout: fixed;
+		}
+		
+		.wrap table tr {
+		  -moz-transition: all 0.2s ease-in-out;
+		  -o-transition: all 0.2s ease-in-out;
+		  -webkit-transition: all 0.2s ease-in-out;
+		  transition: all 0.2s ease-in-out;
+		}
+		
+		.wrap table tr th,
+		.wrap table tr td {
+		  padding: 0 8px;
+		  word-break: break-all;
+		  -moz-transition: all 0.2s ease-in-out;
+		  -o-transition: all 0.2s ease-in-out;
+		  -webkit-transition: all 0.2s ease-in-out;
+		  transition: all 0.2s ease-in-out;
+		  background-color: #fff;
+		  border-bottom: 1px solid #d9d9d9;
+		  color: #626366;
+		  border-right: 1px solid #d9d9d9;
+		  border-left: 1px solid #d9d9d9;
+		}
+		
+		.wrap table tr th {
+		  height: 40px;
+		  font-family: "Noto Sans KR", Nanum Barun Gothic, NanumGothic, malgun gothic, dotum, sans-serif;
+		  letter-spacing: -0.5px;
+		  font-size: 13px;
+		  font-weight: 700;
+		  background-color: #efefef;
+		}
+		
+		.wrap table tr td {
+		  height: 40px;
+		  font-family: "Noto Sans KR", Nanum Barun Gothic, NanumGothic, malgun gothic, dotum, sans-serif;
+		  letter-spacing: -0.5px;
+		  font-size: 14px;
+		}
+		
+		/* *** Button *** */
+		.wrap .BtnWrap {
+		  display: flex;
+		  justify-content: center;
+		  align-items: center;
+		  margin-top: 20px;
+		}
+		
+		.BtnWrap .button {
+		  background-color: #4CAF50;
+		  border: none;
+		  color: white;
+		  padding: 14px 16px;
+		  text-align: center;
+		  text-decoration: none;
+		  display: inline-block;
+		  font-size: 16px;
+		  cursor: pointer;
+		  width:20%;
+		}
+		
+		.BtnWrap .button1 {
+		  background-color: #4CAF50;
+		  color: white;
+		
+		}
+		
+		.BtnWrap .button1:hover {
+		  background-color: white;
+		  color: #fff;
+		  background-color: #46a049;
+		}
+	</style>
+</head>
+<body>
+	<div class="wrap">
+		<h4 class="bold fs_18 ptlf24">[(#{title.sr})]</h4>
+		<div class="table">
+			<table>
+				<colgroup>
+					<col width="13%">
+					<col width="20.3%">
+					<col width="13%">
+					<col width="20.3%">
+					<col width="13%">
+					<col width="20.3%">
+				</colgroup>
+				<tbody>
+					<tr>
+						<th>[(#{label.sr.reqUserId})]</th>
+						<td th:text="${REQ_USER_NM}"></td>
+						<th>[(#{label.sr.srId})]</th>
+						<td colspan="3" th:text="${SR_ID}"></td>
+					</tr>
+					<tr>
+						<th>[(#{label.sr.srTitle})]</th>
+						<td colspan="5" th:text="${SR_TITLE}"></td>
+					</tr>
+					<tr>
+						<th>[(#{label.sr.priorityCd})]</th>
+						<td th:text="${PRIORITY_CD_NM}"></td>
+						<th>[(#{label.sr.presentation})]</th>
+						<td th:text="${REQ_DT}"></td>
+						<th>[(#{label.sr.startDt})]</th>
+						<td th:text="${START_DT}"></td>
+					</tr>
+					<tr>
+						<th>[(#{label.sr.reason})]</th>
+						<td colspan="5" th:text="${REASON}"></td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+		<div class="">
+			<table>
+				<colgroup>
+					<col>
+					<col>
+					<col>
+					<col>
+					<col>
+					<col>
+				</colgroup>
+				<tbody>
+					<tr>
+						<th class="t_center" th:text="#{label.sr.resourceCategory}"></th>
+						<th class="t_center" th:text="#{label.sr.quantity}"></th>
+						<th class="t_center" th:text="#{label.sr.remark}"></th>
+						<th class="t_center" th:text="#{label.sr.startDt}"></th>
+						<th class="t_center" th:text="#{label.sr.rateType}"></th>
+						<th class="t_center" th:text="#{label.sr.amount}"></th>
+					</tr>
+					<tr th:each="data : *{detailList}">
+						<td th:text="${data.RESOURCE_CATEGORY_CD_NM}"></td>
+						<td class="t_right" style="text-align: right" th:text="${data.QUANTITY}"></td>
+						<td th:utext="${#strings.replace(data.REMARK, '&#10', '&lt;br&gt;')}"></td>
+						<td class="t_center" th:text="${data.START_DT}"></td>
+						<td class="t_center" th:text="${data.RATE_TYPE_CD_NM}"></td>
+						<td class="t_right" style="text-align: right" th:text="${data.AMOUNT}"></td>
+					</tr>
+
+				</tbody>
+			</table>
+		</div>
+		<div class="BtnWrap">
+			<a class="button button1" th:href="${SR_LINK}"><span>[(#{title.sr})] 바로가기</span></a>
+		</div>
+	</div>
+</body>
+</html>

@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.kyobo.mapper.maximo.bill.ContractMapper">
+	<sql id="search_query">
+		SELECT TB_CONTRACTID
+			, CONTRACT_TYPE_CD
+			, FN_GET_CODE_NM('CONTRACT_TYPE', CONTRACT_TYPE_CD) AS CONTRACT_TYPE_CD_NM
+			, CONTRACT_NO
+			, CONTRACT_NAME
+			, VARCHAR_FORMAT(TO_DATE(CONTRACT_DATE, 'YYYYMMDD'), 'YYYY/MM/DD') AS CONTRACT_DATE
+			, VARCHAR_FORMAT(AMOUNT, '999,999,999,999') AS AMOUNT
+			, VARCHAR_FORMAT(TO_DATE(START_DATE, 'YYYYMMDD'), 'YYYY/MM/DD') AS START_DATE
+			, VARCHAR_FORMAT(TO_DATE(END_DATE, 'YYYYMMDD'), 'YYYY/MM/DD') AS END_DATE
+			, DEL_YN
+		FROM TB_CONTRACT
+		WHERE COALESCE(DEL_YN, 'N') = 'N'
+	</sql>
+	<sql id="search_conditions">
+		<if test="CONTRACT_TYPE_CD != null and CONTRACT_TYPE_CD != ''">
+			AND CONTRACT_TYPE_CD = #{CONTRACT_TYPE_CD}
+		</if>
+		<if test="CONTRACT_NO != null and CONTRACT_NO != ''">
+			AND CONTRACT_NO = #{CONTRACT_NO}
+		</if>
+		<if test="CONTRACT_NAME != null and CONTRACT_NAME != ''">
+			AND CONTRACT_NAME LIKE '%' || UPPER(#{CONTRACT_NAME}) || '%'
+		</if>
+	</sql>
+	<select id="findAll" parameterType="HashMap" resultType="HashMap">
+		SELECT *
+		FROM (
+			<include refid="search_query"></include>
+			<include refid="search_conditions"></include>
+			<if test="length!=null and !length.equals('')">
+				LIMIT ${length}
+				OFFSET ${start}
+			</if>
+		) A
+	</select>
+	
+	<select id="findCount" parameterType="HashMap" resultType="int">
+		SELECT count(*)
+		FROM (
+			<include refid="search_query"></include>
+			<include refid="search_conditions"></include>
+		) A
+	</select>
+	
+	<select id="findOne" parameterType="HashMap" resultType="HashMap">
+		SELECT *
+		FROM (
+			<include refid="search_query"></include>
+			<include refid="search_conditions"></include>
+		) A
+	</select>
+	
+	<insert id="insert" parameterType="HashMap">
+		INSERT INTO TB_CONTRACT (
+			TB_CONTRACTID
+			, CONTRACT_TYPE_CD
+			, CONTRACT_NO
+			, CONTRACT_NAME
+			, CONTRACT_DATE
+			, AMOUNT
+			, START_DATE
+			, END_DATE
+			, REG_USER_ID
+			, REG_DT
+		) VALUES (
+		 	NEXTVAL FOR TB_CONTRACTIDSEQ
+			, #{CONTRACT_TYPE_CD}
+			, #{CONTRACT_NO}
+			, #{CONTRACT_NAME}
+			, REPLACE(#{CONTRACT_DATE}, '/', '')
+			, REPLACE(#{AMOUNT}, ',', '')
+			, REPLACE(#{START_DATE}, '/', '')
+			, REPLACE(#{END_DATE}, '/', '')
+			, #{REG_USER_ID}
+			, CURRENT TIMESTAMP
+		)
+	</insert>
+	
+	<update id="update" parameterType="HashMap">
+		UPDATE TB_CONTRACT SET
+			CONTRACT_NAME = #{CONTRACT_NAME}
+			, CONTRACT_DATE = REPLACE(#{CONTRACT_DATE}, '/', '')
+			, AMOUNT = REPLACE(#{AMOUNT}, ',', '')
+			, START_DATE = REPLACE(#{START_DATE}, '/', '')
+			, END_DATE = REPLACE(#{END_DATE}, '/', '')
+			, DEL_YN = COALESCE(#{DEL_YN}, 'N')
+			, UPD_USER_ID = #{UPD_USER_ID}
+			, UPD_DT = CURRENT TIMESTAMP
+		WHERE CONTRACT_TYPE_CD = #{CONTRACT_TYPE_CD}
+		AND CONTRACT_NO = #{CONTRACT_NO}
+		AND COALESCE(DEL_YN, 'N') = 'N'
+	</update>
+</mapper>

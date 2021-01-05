@@ -1,0 +1,4 @@
+#로그파일 저장 경로
+log.config.path=D:/ITO/logs/local
+#로그파일명
+log.config.filename=local_log

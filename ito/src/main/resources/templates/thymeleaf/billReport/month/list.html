@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html layout:decorator="thymeleaf/layout/layout_blank">
+<head>
+<title layout:title-pattern="$LAYOUT_TITLE : $CONTENT_TITLE">[(#{title.billReport.month})] - [(#{title.list})]</title>
+</head>
+<body>
+	<div layout:fragment="content">
+		<section class="content">
+			<div class="container-fluid mt-2">
+				<div class="row">
+					<div class="col-lg-12">
+						<div class="card card-primary card-outline">
+							<div class="card-header">
+								<h5 class="card-title m-0" data-th-text="#{title.search}"></h5>
+							</div>
+							<div class="card-body">
+								<form id="search-form" class="form-horizontal">
+									<div class="row">
+										<div class="col-sm-4">
+											<div class="form-group row">
+												<label for="BILL_MONTH" class="col-sm-4 col-form-label" data-th-text="#{label.baseLine.svcMonth}"></label>
+												<div class="col-sm-8">
+													<div class="input-group" id="BILL_MONTH" data-target-input="nearest">
+								                        <input type="text" name="BILL_MONTH" class="form-control datetimepicker-input" data-toggle="datetimepicker" data-target="#BILL_MONTH" required="required">
+								                        <div class="input-group-append" data-target="#BILL_MONTH" data-toggle="datetimepicker">
+								                            <div class="input-group-text d-block"><i class="fa fa-calendar"></i></div>
+								                        </div>
+								                    </div>
+							                    </div>
+											</div>
+										</div>
+									</div>
+									<div class="row">
+										<div class="col-sm-12">
+											<div class="text-center">
+												<button type="submit" class="btn btn-sm btn-primary" data-th-text="#{button.search}"></button>
+												<button type="button" class="btn btn-sm btn-outline-primary" data-action-button="reset" data-th-text="#{button.reset}"></button>
+											</div>
+										</div>
+									</div>
+								</form>
+							</div>
+						</div>
+					</div>
+					<!-- /.col-lg-12 -->
+				</div>
+				<!-- /.row -->
+
+				<div class="row">
+					<div class="col-lg-12">
+						<div class="card card-primary card-outline">
+							<div class="card-header">
+								<h3 class="card-title" data-th-text="#{title.list}"></h3>
+							</div>
+							<!-- /.card-header -->
+							<div class="card-body">
+								<table id="dataTable" class="table table-sm table-bordered table-hover table-striped">
+									<thead>
+										<tr>
+											<th data-th-text="#{label.billReport.contractType}"></th>
+											<th data-th-text="#{label.billReport.detail}"></th>
+											<th class="prev_month" data-th-text="#{label.billReport.prevMonth}"></th>
+											<th class="curr_month" data-th-text="#{label.billReport.month}"></th>
+										</tr>
+									</thead>
+								</table>
+							</div>
+							<!-- /.card-body -->
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+	</div>
+
+	<th:block layout:fragment="script">
+		<script>
+			$(function() {
+				var form = $("#search-form");
+				var validator = form.validate({
+					errorPlacement: function(error, element) {
+						if ( element.hasClass( "select2" )) {
+							$(element).next().find('span span').addClass('is-invalid');
+						}
+					}
+				});
+				var selectedRowData;
+				
+				// 년월
+				$('#BILL_MONTH').createDatePicker({
+					format: 'YYYY/MM',
+					mode: 'months'
+				});
+				
+				// 조회결과 테이블 생성
+				var dataTable = $('#dataTable').createDataTable({
+					bPaginate: false,
+					columns: [
+						{data : "bill_month"},
+						{data : "user"},
+						{data : "reason"},
+						{data : "reason2"} 
+					],
+					columnDefs: [
+						{
+							targets: [0],
+							className: 'text-center',
+						},
+						{
+							targets: [2,3],
+							className: 'text-right',
+							render: function ( data, type, full ) {
+								return $.setComma(data);
+							}
+						}
+					]
+				});
+				
+				// 폼 전송 이벤트
+				form.submit(function(e) {
+				    e.preventDefault();
+				    
+				    if(form.valid()) {
+				    	$.fn.executeAction('search');
+				    }
+				});
+				
+				// 프로세스 처리 함수
+				$.fn.executeAction = function(procType) {
+					switch(procType) {
+						case 'reset' :			// 조회조건 초기화
+							form[0].reset();
+							dataTable.rows().remove().draw();
+							
+							$('#dataTable').find('.prev_month').text('[(#{label.billReport.prevMonth})]');
+							$('#dataTable').find('.curr_month').text('[(#{label.billReport.month})]');
+							
+							break;
+						case 'search' :			// 조회
+							var currMonth = moment($(form).find('[name="BILL_MONTH"]').val(), 'YYYY/MM', true);
+							var prevMonth = moment(currMonth).add(-1, 'M');
+							var cMonth = currMonth.format('YYYY/MM');
+							var pMonth = prevMonth.format('YYYY/MM');
+							
+							$('#dataTable').find('.prev_month').text(pMonth);
+							$('#dataTable').find('.curr_month').text(cMonth);
+							
+							dataTable.rows().remove().draw();
+						
+							$.sendData({
+								data: {
+									BILL_MONTH: $(form).find('[name="BILL_MONTH"]').val().replace(/\//g, '')
+								},
+								url: 'billReport/month/dataList'
+							}, function(result) {
+								dataTable.rows().remove().draw();
+								dataTable.rows.add(result.data).draw();
+							});
+					    	
+							break;
+						default :
+							;
+					}
+				}
+				
+				// 버튼 이벤트
+				$('[data-action-button]').on('click', function() {
+					$(this).executeAction($(this).data('action-button'));
+				});
+			});
+		</script>
+	</th:block>
+</body>
+</html>

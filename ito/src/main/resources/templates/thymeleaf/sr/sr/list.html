@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html layout:decorator="thymeleaf/layout/layout_blank">
+<head>
+<title layout:title-pattern="$LAYOUT_TITLE : $CONTENT_TITLE">[(#{title.sr})] - [(#{title.list})]</title>
+</head>
+<body>
+	<div layout:fragment="content">
+	<input type="hidden" id="SEQ" name="SEQ" class="form-control" required="required">
+		<section class="content">
+			<div class="container-fluid mt-2">
+				<div class="row">
+					<div class="col-lg-12">
+						<div class="card card-primary card-outline">
+							<div class="card-header">
+								<h5 class="card-title m-0" data-th-text="#{title.search}"></h5>
+							</div>
+							<div class="card-body">
+								<form id="search-form" class="form-horizontal">
+									<div class="row">
+										<div class="col-sm-4">
+											<!-- text input -->
+											<div class="form-group row">
+												<label for="REQ_DT" class="col-sm-4 col-form-label" data-th-text="#{label.sr.reqDt}"></label>
+												<div class="col-sm-8">
+													<div class="input-group date" id="reservationdate" data-target-input="nearest">
+								                        <input type="text" class="form-control datetimepicker-input" data-toggle="datetimepicker" data-target="#reservationdate" id="REQ_DT" name="REQ_DT"/>
+								                        <div class="input-group-append" data-target="#reservationdate" data-toggle="datetimepicker">
+								                            <div class="input-group-text d-block"><i class="fa fa-calendar"></i></div>
+								                        </div>
+								                    </div>
+								                </div>
+											</div>
+										</div>
+										<div class="col-sm-4">
+											<!-- text input -->
+											<div class="form-group row">
+												<label for="PRIORITY_CD" class="col-sm-4 col-form-label" data-th-text="#{label.sr.priorityCd}"></label>
+												<div class="col-sm-8">
+													<select id="PRIORITY_CD" name="PRIORITY_CD"
+														class="form-control select2">
+														<option value="" selected="selected"
+															data-th-text="#{label.common.all}"></option>
+													</select>
+												</div>
+											</div>
+										</div>
+										<div class="col-sm-4">
+											<!-- text input -->
+											<div class="form-group row">
+												<label for="SR_ID" class="col-sm-4 col-form-label" data-th-text="#{label.sr.srId}"></label>
+												<div class="col-sm-8">
+													<input type="text" id="SR_ID" name="SR_ID" class="form-control" maxlength="13">
+												</div>
+											</div>
+										</div>
+									</div>
+									<div class="row">
+										<div class="col-sm-4">
+											<!-- text input -->
+											<div class="form-group row">
+												<label for="PROC_TYPE_CD" class="col-sm-4 col-form-label" data-th-text="#{label.sr.procTypeCd}"></label>
+												<div class="col-sm-8">
+													<select id="PROC_TYPE_CD" name="PROC_TYPE_CD"
+														class="form-control select2">
+														<option value="" selected="selected"
+															data-th-text="#{label.common.all}"></option>
+													</select>
+												</div>
+											</div>
+										</div>
+										<div class="col-sm-4">
+											<!-- text input -->
+											<div class="form-group row">
+												<label for="SR_TYPE_CD" class="col-sm-4 col-form-label" data-th-text="#{label.sr.chargeType}"></label>
+												<div class="col-sm-8">
+													<select id="SR_TYPE_CD" name="SR_TYPE_CD"
+														class="form-control select2">
+														<option value="" selected="selected"
+															data-th-text="#{label.common.all}"></option>
+													</select>
+												</div>
+											</div>
+										</div>
+										<div class="col-sm-4">
+											<!-- text input -->
+											<div class="form-group row">
+												<label for="SR_TITLE" class="col-sm-4 col-form-label" data-th-text="#{label.sr.srTitle}"></label>
+												<div class="col-sm-8">
+													<input type="text" id="SR_TITLE" name="SR_TITLE" class="form-control">
+												</div>
+											</div>
+										</div>
+									</div>
+									<div class="row">
+										<div class="col-sm-12">
+											<div class="text-center">
+												<button type="submit" class="btn btn-sm btn-primary" data-th-text="#{button.search}"></button>
+												<button type="button" class="btn btn-sm btn-outline-primary" data-action-button="reset" data-th-text="#{button.reset}"></button>
+											</div>
+										</div>
+									</div>
+								</form>
+							</div>
+						</div>
+					</div>
+					<!-- /.col-lg-12 -->
+				</div>
+				<!-- /.row -->
+
+				<div class="row">
+					<div class="col-lg-12">
+						<div class="card card-primary card-outline">
+							<div class="card-header">
+								<h3 class="card-title" data-th-text="#{title.list}"></h3>
+								<div class="card-tools">
+									<button type="button" class="btn btn-sm btn-success" data-action-button="new">[(#{button.new})]</button>
+								</div>
+							</div>
+							<!-- /.card-header -->
+							<div class="card-body">
+								<table id="dataTable" class="table table-sm table-bordered table-hover table-striped">
+									<thead>
+										<tr>
+											<th data-th-text="#{label.sr.reqDt}"></th>
+											<th data-th-text="#{label.sr.reqUserId}"></th>
+											<th data-th-text="#{label.sr.srTitle}"></th>
+											<th data-th-text="#{label.sr.startDt}"></th>
+											<th data-th-text="#{label.sr.priorityCd}"></th>
+											<th data-th-text="#{label.sr.procTypeCd}"></th>
+											<th data-th-text="#{label.sr.srId}"></th>
+											<th data-th-text="#{label.sr.seq}"></th>
+											<th data-th-text="#{label.sr.attach}"></th>
+										</tr>
+									</thead>
+								</table>
+							</div>
+							<!-- /.card-body -->
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+	</div>
+
+	<th:block layout:fragment="script">
+		<script>
+			$(function() {
+				var form = $("#search-form");
+				var validator = form.validate();
+				var selectedRowData;
+				
+				$("#SEQ").val("");
+				
+				// 공통코드 콤보박스 생성
+				$('select[name="PRIORITY_CD"]').createSelectBox({
+					code_id : 'PRIORITY'
+				});
+				
+				// 처리상태
+				$('select[name="PROC_TYPE_CD"]').createSelectBox({
+					code_id : 'PROC_TYPE'
+				});
+				
+				// 요청유형
+				$('select[name="SR_TYPE_CD"]').createSelectBox({
+					code_id : 'SR_TYPE'
+				});
+				
+				$('#reservationdate').datetimepicker({
+			    	language : 'ko',
+			    	format: 'YYYY/MM/DD',
+			    	mode: 'day'
+			    });
+
+				// 조회결과 테이블 생성
+				var dataTable = $('#dataTable').createDataTable({
+						url: _ctx + "/sr/sr/findDataList",
+						params: {},
+						columns: [
+							{data : "REQ_DT"},
+							{data : "REQ_USER_ID"},
+							{data : "SR_TITLE"},
+							{data : "START_DT"},
+							{data : "PRIORITY_CD_NM"},
+							{data : "PROC_TYPE_CD_NM"},
+							{data : "SR_ID"},
+							{data : "SR_SEQ"},
+							{data : "ATTACH_ID"}
+						],
+						columnDefs: [
+							{
+								targets: [0],
+								className: 'text-center'
+							},
+							{
+								targets: [1],
+								className: 'text-center'
+							},							
+							{
+								targets: [2],
+								className: 'text-center'
+							},
+							{
+								targets: [3],
+								className: 'text-center'
+							},							
+							{
+								targets: [4],
+								className: 'text-center'
+							},							
+							{
+								targets: [5],
+								className: 'text-center'
+							},
+							{
+								targets: [6],
+								className: 'text-center'
+							},
+							{
+								targets: [7],
+								className: 'text-center'
+							},
+							{
+								targets: [8],
+								className: 'text-center',
+								render: function ( data, type, full, meta ) {
+									var colContent = '';
+									
+									if(data && data != '') {
+										colContent += '<i class="fas fa-paperclip"></i>';
+									}
+									
+									return colContent;
+								}
+							},
+						]
+				});
+				
+				// 폼 전송 이벤트
+				form.submit(function(e) {
+				    e.preventDefault();
+				    $.fn.executeAction('search');
+				});
+				
+				// 프로세스 처리 함수
+				$.fn.executeAction = function(procType) {
+					switch(procType) {
+						case 'reset' :		// 조회조건 초기화
+							form[0].reset();
+							form.find("select").trigger("change");
+							break;
+						case 'new' :		// 신규
+							parent.tabsComp.createTabs({
+								id: 'new',
+								title: '[(#{button.new})]',
+								isIframe: true,
+								url: _ctx + '/sr/sr/regist',
+								method: 'add',
+								closable: true
+							});
+						
+							break;
+						case 'update' :		// 수정
+							parent.tabsComp.createTabs({
+								id: 'update_' + selectedRowData['SR_ID'],
+								title: selectedRowData['SR_TITLE'] + '(' + selectedRowData['SR_ID'] + '_' + selectedRowData['SR_SEQ'] + ')',
+								isIframe: true,
+								url: _ctx + '/sr/sr/update',
+								method: 'add',
+								closable: true,
+								sendData: {
+									SR_ID: selectedRowData['SR_ID'],
+									SR_SEQ: selectedRowData['SR_SEQ']
+								}
+							});
+							break;
+						case 'search' :
+							var dataTableParams = form.serialize();
+							
+					    	dataTable.ajax.url(_ctx + '/sr/sr/findDataList?' + dataTableParams).draw();
+							break;
+						default :
+							;
+					}
+				}
+				
+				// 버튼 이벤트
+				$('[data-action-button]').on('click', function() {
+					$(this).executeAction($(this).data('action-button'));
+				});
+				
+				// 목록 더블클릭 이벤트
+				$('#dataTable tbody').on('dblclick', 'tr', function() {
+					selectedRowData = dataTable.row(this).data();
+					
+					if(selectedRowData) {
+						$.fn.executeAction('update');
+					}
+				});
+				
+			});
+		</script>
+	</th:block>
+</body>
+</html>

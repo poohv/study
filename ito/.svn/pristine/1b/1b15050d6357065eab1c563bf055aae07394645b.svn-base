@@ -1,0 +1,880 @@
+<!DOCTYPE html>
+<html layout:decorator="thymeleaf/layout/layout_blank">
+<head>
+<title layout:title-pattern="$LAYOUT_TITLE : $CONTENT_TITLE">[(#{title.sr})] - [(#{title.update})]</title>
+</head>
+<body>
+
+	<div layout:fragment="content">
+		<section class="content">
+			<div class="container-fluid">
+				<div class="row mt-2">
+					<div class="col-lg-12">
+						<form id="input-form">
+							<input type="hidden" name="SEND_TYPE" value="R">
+							<input type="hidden" name="SR_SEQ">
+							<div class="card card-primary card-outline">
+								<div class="card-header">
+									<h5 class="card-title m-0" data-th-text="#{title.sr.receive}"></h5>
+								</div>
+								<div class="card-body">
+									<div class="row">
+										<div class="col-sm-6">
+											<div class=" form-group">
+												<label for="PERSONGROUP">[(#{label.sr.receiveGroup})] <i class="fas fa-check text-danger"></i></label>
+												<select id="PERSONGROUP" name="PERSONGROUP" class="form-control select2" multiple="multiple">
+												</select>
+											</div>
+										</div>
+										<div class="col-sm-6">
+											<div class=" form-group">
+												<label for="RECEIVE_EMAIL">[(#{label.sr.receive.user})] <i class="fas fa-check text-danger"></i>
+													<button type="button" class="btn btn-primary btn-xs" data-action-button="add-receive">[(#{button.add})]</button>
+												</label>
+												<table id="dataTable-email" style="margin-top: -0px !important;" class="table nowrap table-sm table-bordered table-hover table-striped">
+													<thead>
+														<tr>
+															<th data-th-text="#{label.sr.receive.userId}"></th>
+															<th data-th-text="#{label.sr.receive.name}"></th>
+															<th data-th-text="#{label.sr.receive.email}"></th>
+															<th></th>
+														</tr>
+													</thead>
+												</table>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="card card-primary card-outline">
+								<div class="card-header">
+									<h5 class="card-title m-0" data-th-text="#{title.sr}"></h5>
+								</div>
+								<div class="card-body">
+									<div class="row">
+										<div class="col-sm-4">
+											<div class=" form-group">
+												<label for="REQ_USER_NM">[(#{label.sr.reqUserId})] <i class="fas fa-check text-danger"></i></label>
+												<input type="text" id="REQ_USER_NM" name="REQ_USER_NM" class="form-control" readonly="readonly">
+												<input type="hidden" id="REQ_USER_ID" name="REQ_USER_ID">
+											</div>
+										</div>
+										<div class="col-sm-4">
+											<div class="form-group">
+												<label for="SR_ID">[(#{label.sr.srId})] <i class="fas fa-check text-danger"></i></label>
+												<input type="text" id="SR_ID" name="SR_ID" class="form-control" readonly="readonly" data-th-value="${SR_ID}">
+											</div>
+										</div>
+									</div>
+									<div class="row">
+										<div class="col-sm-12">
+											<div class=" form-group">
+												<label for="SR_TITLE">[(#{label.sr.srTitle})] <i class="fas fa-check text-danger"></i></label>
+												<input type="text" id="SR_TITLE" name="SR_TITLE" class="form-control">
+											</div>
+										</div>
+									</div>
+									<div class="row">
+										<div class="col-sm-4">
+											<div class=" form-group">
+												<label for="PRIORITY_CD">[(#{label.sr.priorityCd})] <i class="fas fa-check text-danger"></i></label>
+												<select id="PRIORITY_CD" name="PRIORITY_CD"
+													class="form-control select2">
+												</select>
+											</div>
+										</div>
+										<div class="col-sm-4">
+											<!-- text input -->
+											<div class="form-group">
+												<label for="REQ_DT">[(#{label.sr.presentation})] <i class="fas fa-check text-danger"></i></label>
+												<div class="input-group date" id="REQ_DT" data-target-input="nearest">
+							                        <input type="text" name="REQ_DT" class="form-control datetimepicker-input" data-toggle="datetimepicker" data-target="#REQ_DT">
+							                        <div class="input-group-append" data-target="#REQ_DT" data-toggle="datetimepicker">
+							                            <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+							                        </div>
+							                    </div>
+											</div>
+										</div>
+										<div class="col-sm-4">
+											<div class="form-group">
+												<label for="START_DT">[(#{label.sr.startDt})] <i class="fas fa-check text-danger"></i></label>
+												<div class="input-group date" id="START_DT" data-target-input="nearest">
+							                        <input type="text" name="START_DT" class="form-control datetimepicker-input" data-toggle="datetimepicker" data-target="#START_DT">
+							                        <div class="input-group-append" data-target="#START_DT" data-toggle="datetimepicker">
+							                            <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+							                        </div>
+							                    </div>
+											</div>
+										</div>
+									</div>
+									<div class="row">
+										<div class="col-sm-8">
+											<div class=" form-group">
+												<label for="REASON">[(#{label.sr.reason})] <i class="fas fa-check text-danger"></i></label>
+												<input type="text" id="REASON" name="REASON" class="form-control">
+											</div>
+										</div>
+										<div class="col-sm-4">
+											<div class=" form-group">
+												<label for="PROC_TYPE_CD">[(#{label.sr.procTypeCd})] <i class="fas fa-check text-danger"></i></label>
+												<select id="PROC_TYPE_CD" name="PROC_TYPE_CD" class="form-control select2">
+												</select>
+											</div>
+										</div>
+									</div>
+									<div class="row">
+										<div class="col-sm-12">
+											<div class="form-group">
+												<label for="ATTACH_FILE">[(#{label.sr.attach})]</label>
+												<div class="input-group">
+													<div class="custom-file">
+	               										<input type="file" class="custom-file-input" id="ATTACH_FILE" multiple="multiple">
+	               										<label class="custom-file-label overflow-hidden" for="ATTACH_FILE">[(#{label.common.choose.file})]</label>
+               										</div>
+               									</div>
+											</div>
+										
+											<div class="form-group">
+												<input type="hidden" name="ORG_ATTACH_ID">
+												<table id="attachList" class="table table-striped table-sm table-bordered">
+													<thead>
+														<tr>
+															<th></th>
+															<th>#</th>
+															<th data-th-text="#{label.attach.fileName}"></th>
+															<th data-th-text="#{label.attach.size}"></th>
+														</tr>
+													</thead>
+												</table>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</form>
+						<form id="list-form">
+							<div class="card card-primary card-outline">
+								<div class="card-header">
+									<h5 class="card-title m-0" data-th-text="#{title.sr.detail}"></h5>
+									<div class="card-tools">
+										<button type="button" class="btn btn-sm btn-success" data-action-button="add">[(#{button.add})]</button>
+									</div>
+								</div>
+								<div class="card-body">
+									<table id="dataTable" class="table nowrap table-sm table-bordered table-hover table-striped">
+										<thead>
+											<tr>
+												<th data-th-text="#{label.sr.resourceCategory}"></th>
+												<th data-th-text="#{label.sr.hostNm}"></th>
+												<th data-th-text="#{label.sr.chargeType}"></th>
+												<th data-th-text="#{label.sr.quantity}"></th>
+												<th data-th-text="#{label.sr.remark}"></th>
+												<th data-th-text="#{label.sr.startDt}"></th>
+												<th data-th-text="#{label.sr.rateType}"></th>
+												<th data-th-text="#{label.sr.amount}"></th>
+												<th data-th-text="#{label.sr.procTypeCd}"></th>
+												<th></th>
+											</tr>
+										</thead>
+									</table>
+								</div>
+								<div class="card-footer">
+									<div class="row">
+										<div class="col-sm-12">
+											<div class="text-center">
+												<th:block sec:authorize="hasAuthority('KBSRUSER')">
+													<button type="button" class="btn btn-sm btn-primary" data-action-button="validate" data-th-text="#{button.sr.resend}"></button>
+												</th:block>
+												<th:block sec:authorize="hasAuthority('KBSRADM')">
+													<button type="button" class="btn btn-sm btn-primary" data-action-button="update" data-th-text="#{button.update}"></button>
+												</th:block>
+												<button type="button" class="btn btn-sm btn-outline-primary" data-action-button="cancel" data-th-text="#{button.cancel}"></button>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</form>
+					</div>
+					<!-- /.col-lg-12 -->
+				</div>
+				<!-- /.row -->
+			</div>
+		</section>
+	</div>
+
+	<th:block layout:fragment="script">
+		<script th:src="@{/adminlte/plugins/bs-custom-file-input/bs-custom-file-input.min.js}"></script>
+		<script>
+			$(function() {
+				var _SR_ID = '[(${SR_ID})]';
+				var _SR_SEQ = '[(${SR_SEQ})]';
+				var form = $("#input-form");
+				var listForm = $("#list-form");
+				var validator = form.validate({
+					unhighlight: function (element, errorClass, validClass) {
+						$(element).removeClass('is-invalid');
+						
+						// 콤보
+						if ( $(element).hasClass( "select2" )) {
+							$(element).next().find('span span').removeClass('is-invalid');
+						}
+					}
+				});
+				
+				var listValidator = listForm.validate({
+					errorPlacement: function ( error, element ) {
+						error.addClass('invalid-feedback');
+					}
+				});
+				
+				bsCustomFileInput.init();
+				
+				// 수신 그룹
+				var personGroup = $('select[name="PERSONGROUP"]').createSelectBox({
+					url: _ctx + '/sr/srGroup/findTowerGroupList'
+				});
+				
+				// 우선순위
+				var priorityCd = $('select[name="PRIORITY_CD"]').createSelectBox({
+					code_id : 'PRIORITY'
+				});
+				
+				// 처리상태
+				$('select[name="PROC_TYPE_CD"]').createSelectBox({
+					code_id : 'PROC_TYPE'
+				});
+				
+				// 제출일
+				$('#REQ_DT').createDatePicker({
+					format: 'YYYY/MM/DD'
+				});
+				
+				// 개시요청일자
+				$('#START_DT').createDatePicker({
+					format: 'YYYY/MM/DD'
+				});
+				
+				// 수신자 목록 생성
+				var dataTableEmail = $('#dataTable-email').createDataTable({
+					bPaginate: false,
+					dom: 'frt',
+					columns: [
+						{data : "PERSONID", visible: false},
+						{data : "DISPLAYNAME"},
+						{data : "EMAILADDRESS"},
+						{
+							className: 'text-center text-danger btn-list-remove',
+							orderable: false,
+							data: null,
+							defaultContent: '<button type="button" class="btn btn-xs"><i class="fas fa-minus-circle text-danger"></i></button>'
+						}
+					]
+				});
+				// 수신자 목록에서 제거
+				$('#dataTable-email').on('click', '.btn', function() {
+					dataTableEmail.row($(this).parents('tr')).remove().draw();
+				});
+				
+				// 첨부파일 목록 생성
+				var dataTableAttach = $('#attachList').createDataTable({
+					bPaginate: false,
+					dom: 'frt',
+					columns: [
+						{data : "ATTACH_ID", visible: false},
+						{data : "ORDER_NO"},
+						{data : "ORG_FILE_NAME"},
+						{data : "SIZE"}
+					],
+					columnDefs: [
+						{
+							targets: [1],
+							className: 'text-center',
+							render: function ( data, type, full, meta ) {
+								return data + 1;
+							}
+						},
+						{
+							targets: [2],
+							render: function ( data, type, full, meta ) {
+								var colContent = '';
+								colContent += '<a href="' + _ctx + '/attach/download?ATTACH_ID=' + full['ATTACH_ID'] + '&ORDER_NO=' + full['ORDER_NO'] + '">';
+								colContent += data;
+								colContent += '</a>';
+								
+								return colContent;
+							}
+						},
+						{
+							targets: [3],
+							render: function ( data, type, full, meta ) {
+								return data + 'KB';
+							}
+						}
+					]
+				});
+				
+				// 조회결과 테이블 생성
+				var dataTable = $('#dataTable').createDataTable({
+					bPaginate: false,
+					dom: 'ifrt',
+					columns: [
+						{data : "RESOURCE_CATEGORY_CD_NM"},
+						{data : "HOST_NM"},
+						{data : "SR_TYPE_CD"},
+						{data : "QUANTITY"},
+						{data : "REMARK"},
+						{data : "START_DT"},
+						{data : "RATE_TYPE_CD"},
+						{data : "AMOUNT"},
+						{data : "PROC_TYPE_CD"},
+						{
+							className: 'text-center text-danger btn-list-remove',
+							orderable: false,
+							data: null,
+							defaultContent: '<i class="fas fa-minus-circle"></i>'
+						}
+					],
+					columnDefs: [
+						{
+							targets: [0],
+							render: function ( data, type, full, meta ) {
+								var colContent = '';
+								colContent += '<input type="hidden" name="BASELINE_ID" class="amount-target" value="' + full['BASELINE_ID'] + '">';
+								colContent += '<div class="resource-category form-group m-0 p-0">';
+								colContent += '    <div class="input-group">';
+								colContent += '        <input type="text" name="RESOURCE_CATEGORY_CD_NM" class="form-control" readonly="readonly" required="required" value="' + full['RESOURCE_CATEGORY_CD_NM'] + '">';
+								colContent += '        <div class="input-group-append">';
+								colContent += '            <button type="button" class="btn btn-default"><i class="fas fa-search"></i></button>';
+								colContent += '        </div>';
+								colContent += '    </div>';
+								colContent += '</div>';
+								
+								return colContent;
+							}
+						},
+						{
+							targets: [1],
+							render: function ( data, type, full, meta ) {
+								var colContent = '';
+								colContent += '<input type="text" name="HOST_NM" class="form-control" maxlength="50" value="' + data + '">';
+								
+								return colContent;
+							}
+						},
+						{
+							targets: [2],
+							render: function ( data, type, full, meta ) {
+								var colContent = '';
+								colContent += '<select name="SR_TYPE_CD" class="form-control amount-target">';
+								colContent += '</select>';
+								
+								$.setComboData({
+									id: 'SR_TYPE_CD',
+									meta: meta,
+									selVal: data,
+									url: '/api/code/SR_TYPE'
+								});
+								
+								return colContent;
+							}
+						},
+						{
+							targets: [3],
+							render: function ( data, type, full, meta ) {
+								var colContent = '';
+								colContent += '<div class="input-group">';
+								colContent += '<input type="number" name="QUANTITY" class="form-control amount-target" required="required" value="' + data.trim() + '">';
+								colContent += '<div class="input-group-append"><span class="input-group-text units">' + full['UNITS'] + '</span></div>';
+								colContent += '</div>';
+								return colContent;
+							}
+						},
+						{
+							targets: [4],
+							render: function ( data, type, full, meta ) {
+								var colContent = '';
+								colContent += '<textarea name="REMARK" class="form-control" required="required" maxlength="500">' + data + '</textarea>';
+								
+								return colContent;
+							}
+						},
+						{
+							targets: [5],
+							render: function ( data, type, full, meta ) {
+								var colContent = '';
+								colContent += '<div class="input-group date amount-target-date" id="START_DT_LIST' + meta.row + '" data-target-input="nearest" data-date-format="YYYY/MM/DD" data-date-allowInputToggle="true">';
+								colContent += '    <input type="text" name="START_DT_LIST" class="form-control datetimepicker-input" data-toggle="datetimepicker" required="required" data-inputmask-alias="datetime" data-inputmask-inputformat="yyyy/mm/dd" data-mask value="' + data + '">';
+								colContent += '    <div class="input-group-append" data-target="#START_DT_LIST' + meta.row + '" data-toggle="datetimepicker">';
+								colContent += '        <div class="input-group-text"><i class="fa fa-calendar"></i></div>';
+								colContent += '    </div>';
+								colContent += '</div>';
+								
+								return colContent;
+							}
+						},
+						{
+							targets: [6],
+							render: function ( data, type, full, meta ) {
+								var colContent = '';
+								colContent += '<select name="RATE_TYPE_CD" class="form-control amount-target" required="required">';
+								colContent += '<option value="' + data + '">' + full['RATE_TYPE_CD_NM'] + '</option>';
+								colContent += '</select>';
+								
+								$.setComboData({
+									id: 'RATE_TYPE_CD',
+									meta: meta,
+									url: '/api/code/RATE_TYPE'
+								});
+								
+								return colContent;
+							}
+						},
+						{
+							targets: [7],
+							render: function ( data, type, full, meta ) {
+								var colContent = '';
+								colContent += '<input type="text" name="AMOUNT" class="form-control text-right" readonly="readonly" value="' + data.trim() + '">';
+								
+								return colContent;
+							}
+						},
+						{
+							targets: [8],
+							render: function ( data, type, full, meta ) {
+								var colContent = '';
+								colContent += '<select name="PROC_TYPE_CD" class="form-control" required="required">';
+								colContent += '</select>';
+								
+								$.setComboData({
+									id: 'PROC_TYPE_CD',
+									meta: meta,
+									selVal: full['PROC_TYPE_CD'],
+									url: '/api/code/PROC_TYPE'
+									
+								});
+								
+								return colContent;
+							}
+						},
+					]
+				});
+				
+				// 요청 상세 목록 삭제
+				$(document).on('mouseover', '#dataTable tbody .btn-list-remove', function() {
+					$(this).css('cursor', 'pointer');
+				}).on('click', '#dataTable tbody .btn-list-remove', function() {
+					if(confirm('[(#{msg.confirm.delete})]')) {
+						var idx = $('#dataTable tbody .btn-list-remove').index(this);
+						dataTable.row($('#dataTable tbody tr').eq(idx)).remove().draw();
+					}
+				});
+				
+				// 요청 상세 리소스 카테고리 팝업
+				$(document).on('focus', '#dataTable .resource-category', function() {
+					var _this = this;
+					
+					$(_this).find('[name="RESOURCE_CATEGORY_CD_NM"]').createPopup({
+						type: 'baseline',
+						title: '리소스 카테고리',
+						callback: function(data) {
+							var idx = $('#dataTable [name="RESOURCE_CATEGORY_CD_NM"]').index($(_this).find('[name="RESOURCE_CATEGORY_CD_NM"]'));
+							
+							$('#dataTable [name="BASELINE_ID"]').eq(idx).val(data['BASELINE_ID']);
+							$('#dataTable [name="RESOURCE_CATEGORY_CD_NM"]').eq(idx).val(data['RESOURCE_CATEGORY_CD_NM']);
+							$('#dataTable .units').eq(idx).text(data['UNITS']);
+							
+							$.setAmount(idx);
+						}
+					});
+				});
+				
+				// 요청 상세 콤보 변경 이벤트
+				$(document).on('change', '#dataTable .amount-target', function() {
+					var rowIdx = $('#dataTable [name="' + $(this).attr('name') + '"]').index(this);
+					$.setAmount(rowIdx);
+				});
+				// 개시요청일자 변경 이벤트
+				$(document).on('hide.datetimepicker', '#dataTable .amount-target-date', function() {
+					var rowIdx = $('#dataTable .amount-target-date').index(this);
+					$.setAmount(rowIdx);
+				});
+				
+				// 요청 상세 예상금액 조회
+				$.setAmount = function(rowIdx) {
+					var _idx = rowIdx;
+					var calcData = {
+						BASELINE_ID: $('#dataTable [name="BASELINE_ID"]').eq(_idx).val(),
+						QUANTITY: $('#dataTable [name="QUANTITY"]').eq(_idx).val().replace(/\,/gi, ''),
+						RATE_TYPE_CD: $('#dataTable [name="RATE_TYPE_CD"]').eq(_idx).val(),
+						START_DT: $('#dataTable [name="START_DT_LIST"]').eq(_idx).val().replace(/\//gi, '')
+					};
+					
+					if(!calcData['QUANTITY'] || calcData['QUANTITY'] == '') {
+						calcData['QUANTITY'] = 0;
+					}
+					
+					$.sendData({
+						url: '/bill/rate/findAmount',
+						data: calcData
+					}, function(data) {
+						// 계산처리
+						$('#dataTable [name="AMOUNT"]').eq(_idx).val($.setComma(data));
+					});
+				};
+				
+				// 요청 상세 콤보 데이터 셋팅
+				$.setComboData = function(options) {
+					var _td = $('#dataTable').DataTable().cell(options['meta'].row, options['meta'].col).nodes();
+					var _data = options['data'];
+					var _selVal = options['selVal'];
+					
+					$.sendData({
+						url: options['url'],
+						data: _data
+					}, function(data) {
+						var optionsHtml = '';
+						var selected = '';
+						
+						for(var i=0; i<data.length; i++) {
+							if(data[i]['CODE_ID'] == _selVal) {
+								selected = 'selected';
+							} else {
+								selected = '';
+							}
+							
+							optionsHtml += '<option value="' + data[i]['CODE_ID'] + '" ' + selected + '>' + data[i]['CODE_NM'] + '</option>';
+						}
+						
+						var _select = $(_td).find('select');
+						
+						$(_select).html(optionsHtml).select2({width: '100%'});
+					});
+				};
+				
+				// 프로세스 처리 함수
+				$.fn.executeAction = function(procType) {
+					switch(procType) {
+						case 'search' :		// 데이터 조회
+							// 요청정보 조회
+							$.sendData({
+								url: '/sr/sr/findData',
+								async: false,
+								data: {
+									SR_ID: _SR_ID,
+									SR_SEQ: _SR_SEQ
+								},
+							}, function(data) {
+								form.find('[name="REQ_USER_NM"]').val(data['REQ_USER_ID']);
+								form.find('[name="REQ_PHONE"]').val(data['REQ_PHONE']);
+								form.find('[name="REQ_EMAIL"]').val(data['REQ_EMAIL']);
+								form.find('[name="SR_TITLE"]').val(data['SR_TITLE']);
+								form.find('[name="SR_ID"]').val(data['SR_ID']);
+								form.find('[name="SR_SEQ"]').val(data['SR_SEQ']);
+								form.find('[name="PRIORITY_CD"]').append(new Option(data['PRIORITY_CD_NM'], data['PRIORITY_CD'], true, true)).trigger('change');
+								form.find('[name="REQ_DT"]').val(data['REQ_DT']);
+								form.find('[name="START_DT"]').val(data['START_DT']);
+								form.find('[name="REASON"]').val(data['REASON']);
+								form.find('[name="PROC_TYPE_CD"]').append(new Option(data['PROC_TYPE_CD_NM'], data['PROC_TYPE_CD'], true, true)).trigger('change');
+								form.find('[name="ORG_ATTACH_ID"]').val(data['ATTACH_ID']);
+								
+								// 수신그룹 조회
+								if(data['PERSONGROUP']) {
+									$.sendData({
+										url: '/sr/srGroup/findTowerGroupNmList',
+										data: {PERSONGROUP: data['PERSONGROUP'].split(',')},
+									}, function(data) {
+										var options = '';
+										var selValArr = [];
+										
+										for(var i=0; i<data.length; i++) {
+											selValArr.push(data[i].CODE_ID);
+											options += '<option value="' + data[i].CODE_ID + '">' + data[i].CODE_NM + '</option>';
+										}
+										
+										$('select[name="PERSONGROUP"]').html(options);
+										$('select[name="PERSONGROUP"]').val(selValArr).change();
+									});
+								}
+								
+								// 수신자 목록 조회
+								$.sendData({
+									url: '/sr/sr/findReceiveList',
+									data: {
+										SR_ID: data['SR_ID'],
+										SR_SEQ: data['SR_SEQ']
+									},
+								}, function(data) {
+									dataTableEmail.rows().remove().draw();
+									dataTableEmail.rows.add(data).draw();
+								});
+							});
+							
+							// 첨부파일 조회
+							$.sendData({
+								url: '/attach/dataList',
+								data: {ATTACH_ID: form.find('[name="ORG_ATTACH_ID"]').val()}
+							}, function(data) {
+								dataTableAttach.rows.add(data).draw();
+							});
+							
+							// 요청상세 조회
+							$.sendData({
+								url: '/sr/sr/findDetailList',
+								data: {
+									SR_ID: _SR_ID,
+									SR_SEQ: _SR_SEQ
+								},
+							}, function(data) {
+								dataTable.rows().remove().draw();
+								dataTable.rows.add(data).draw();
+							});
+						
+							break;
+						case 'validate' :	// 정합성 체크
+							//if(listForm.valid() && form.valid()) {
+								$.fn.executeAction('regist');
+							//}
+							
+							break;
+						case 'add' :		// 추가
+							dataTable.rows.add([{
+								RESOURCE_CATEGORY_CD_NM: '',
+								HOST_NM: '',
+								SR_CHARGE_TYPE_CD: '',
+								QUANTITY: '',
+								REMARK: '',
+								RATE_TYPE_CD: '',
+								AMOUNT: '',
+								PROC_TYPE_CD: ''
+							}]).draw();
+						
+							$('[data-mask]').inputmask();
+							
+							break;
+						case 'add-receive' :	// 수신자 추가
+							// 사용자정보
+							$.fn.createPopup({
+								type: 'user',
+								title: '사용자 정보',
+								callback: function(data) {
+									var isExist = false;
+									
+									$('#dataTable-email tbody tr').each(function(i) {
+										var rowMap = dataTableEmail.row(i).data();
+										
+										if(rowMap && rowMap['PERSONID'] == data['PERSONID']) {
+											isExist = true;
+										} 
+									});
+									
+									if(!isExist) {
+										dataTableEmail.rows.add([data]).draw();
+									}
+								}
+							});
+							
+							break;
+						case 'regist' :		// 등록
+							var formData = {};	
+							var toEmailArr = [];
+							
+							// 요청정보 입력 체크
+							if(!form.valid()) return false;
+							
+							var isValidDetail = true;
+							
+							// 요청상세 입력 체크
+							$(listForm).find('input, select').each(function(i) {
+								if(!$(this).valid()) {
+									isValidDetail = false;
+								}
+							});
+							
+							if(!isValidDetail) return false;
+							
+							$(form).serializeArray().map(function(x) {formData[x.name] = x.value;});
+							formData['PRIORITY_CD_NM'] = $('#PRIORITY_CD option:selected').text();
+							
+							// 수신그룹
+							formData['PERSONGROUP'] = $('#PERSONGROUP').val().toString();
+							
+							var personGroupData = $('#PERSONGROUP').select2('data');
+							var personGroupNmArr = [];
+							
+							for(var i=0; i<personGroupData.length; i++) {
+								personGroupNmArr.push(personGroupData[i].text);
+							}
+							// 수신그룹 명
+							formData['PERSONGROUP_NM'] = personGroupNmArr.toString();
+							
+							// 수신자 목록
+							for (var i=0; i<dataTableEmail.rows().data().length; i++) {
+								toEmailArr.push(dataTableEmail.rows().data()[i]);
+							}
+							
+							formData['toList'] = toEmailArr;
+							
+							// 수신자 입력 여부 체크
+							if(formData['toList'].length == 0
+									&& !formData['PERSONGROUP']) {
+								$.showAlert({
+									type: 'error',
+									msg: '[(#{msg.sr.no.receive})]'
+								});
+								return false;
+							}
+							
+							var listDataArr = [];
+							
+							$('#dataTable tbody tr').each(function(i) {
+								var rowMap = {};
+								
+								rowMap['BASELINE_ID'] = $(this).find('[name="BASELINE_ID"]').val();
+								rowMap['RESOURCE_CATEGORY_CD_NM'] = $(this).find('[name="RESOURCE_CATEGORY_CD_NM"]').val();
+								rowMap['SR_TYPE_CD'] = $(this).find('[name="SR_TYPE_CD"]').val();
+								rowMap['SR_TYPE_CD_NM'] = $(this).find('[name="SR_TYPE_CD"] option:selected').text();
+								rowMap['QUANTITY'] = $(this).find('[name="QUANTITY"]').val();
+								rowMap['REMARK'] = $(this).find('[name="REMARK"]').val();
+								rowMap['START_DT'] = $(this).find('[name="START_DT_LIST"]').val();
+								rowMap['RATE_TYPE_CD'] = $(this).find('[name="RATE_TYPE_CD"]').val();
+								rowMap['RATE_TYPE_CD_NM'] = $(this).find('[name="RATE_TYPE_CD"] option:selected').text();
+								rowMap['AMOUNT'] = $(this).find('[name="AMOUNT"]').val();
+								rowMap['PROC_TYPE_CD'] = $(this).find('[name="PROC_TYPE_CD"]').val();
+								rowMap['PROC_TYPE_CD_NM'] = $(this).find('[name="PROC_TYPE_CD_NM"] option:selected').text();
+								rowMap['HOST_NM'] = $(this).find('[name="HOST_NM"]').val();
+								rowMap['ORDER_NO'] = i;
+								
+								if(rowMap['BASELINE_ID']) {
+									listDataArr.push(rowMap);
+								}
+							});
+							
+							formData['detailList'] = listDataArr;
+							
+							// 요청상세 입력 체크
+							if(formData['detailList'].length == 0) {
+								$.showAlert({
+									type: 'error',
+									msg: '[(#{msg.sr.no.detail})]'
+								});
+								return false;
+							}
+							
+							$('.content').loading({display: true});
+							
+							// 첨부파일
+							if($('#ATTACH_FILE')[0].files.length > 0) {
+								var attachFormData = new FormData();
+								
+								for(var i=0; i<$('#ATTACH_FILE')[0].files.length; i++) {
+									attachFormData.append('ATTACH_FILE', $('#ATTACH_FILE')[0].files[i]);
+								}
+								
+								// 첨부파일 업로드
+								$.sendAttachData({
+									url: '/attach/upload',
+									data: attachFormData,
+									async: false,
+									notification: false
+								}, function(data) {
+									if(data.result == 'S') {
+										formData['ATTACH_ID'] = data['ATTACH_ID'];
+									}
+								});
+							}
+							
+							// 폼 데이터 전송
+							$.sendData({
+								url: '/sr/sr/registData',
+								data: formData,
+								async: false,
+								notification: true
+							}, function(data) {
+								$('.card').loading({display: false});
+								
+								if(data.result == 'S') {
+									parent.$('#list').get(0).contentWindow.location.reload();
+									
+									$.fn.executeAction('cancel');
+								}
+							});
+							
+							break;
+						case 'update' :		// 수정
+							var formData = {};
+							
+							// 요청정보 입력 체크
+							if(!form.valid()) return false;
+							
+							var isValidDetail = true;
+							
+							// 요청상세 입력 체크
+							$(listForm).find('input, select').each(function(i) {
+								if(!$(this).valid()) {
+									isValidDetail = false;
+								}
+							});
+							
+							if(!isValidDetail) return false;
+							
+							$(form).serializeArray().map(function(x) {formData[x.name] = x.value;});
+							
+							var listDataArr = [];
+							
+							$('#dataTable tbody tr').each(function(i) {
+								var rowMap = dataTable.row(i).data();
+								
+								rowMap['PROC_TYPE_CD'] = $(this).find('[name="PROC_TYPE_CD"]').val();
+								
+								listDataArr.push(rowMap);
+							});
+							
+							formData['detailList'] = listDataArr;
+							
+							// 요청상세 입력 체크
+							if(formData['detailList'].length == 0) {
+								$.showAlert({
+									type: 'error',
+									msg: '[(#{msg.sr.no.detail})]'
+								});
+								return false;
+							}
+							
+							// 폼 데이터 전송
+							$.sendData({
+								url: '/sr/sr/updateData',
+								data: formData,
+								notification: true,
+								isIframe: true
+							}, function(data) {
+								if(data.result == 'S') {
+									parent.$('#list').get(0).contentWindow.location.reload();
+									
+									$.fn.executeAction('cancel');
+								}
+							});
+							
+							break;
+						case 'cancel' :		// 취소
+							var activeTab = parent.tabsComp.tabs('getSelected');
+							var activeIdx = parent.tabsComp.tabs('getTabIndex', activeTab);
+							parent.tabsComp.tabs('close', activeIdx);
+							
+							break;
+						default :
+							;
+					}
+				}
+				
+				// 버튼 이벤트
+				$('[data-action-button]').on('click', function() {
+					$(this).executeAction($(this).data('action-button'));
+				});
+				
+				$.fn.executeAction('search');
+			});
+		</script>
+	</th:block>
+</body>
+</html>

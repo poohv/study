@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8" />
+	<title>ITO 서비스 포탈</title>
+	<!-- 공통 css, js -->
+	<th:block th:replace="thymeleaf/fragment/config :: configFragment"></th:block>
+</head>
+    
+<body class="sidebar-mini layout-fixed">
+	<div class="wrapper">
+		<!-- header fragment 사용 -->
+		<th:block th:replace="thymeleaf/fragment/header :: headerFragment"></th:block>
+
+		<!-- menu fragment 사용 -->
+		<th:block th:replace="thymeleaf/fragment/menu :: menuFragment"></th:block>
+
+		<!-- content -->
+		<div class="content-wrapper" layout:fragment="content"></div>
+
+		<!-- footer fragment 사용 -->
+		<th:block th:replace="thymeleaf/fragment/footer :: footerFragment"></th:block>
+		
+		<!-- script fragment 사용 -->
+		<th:block th:replace="thymeleaf/fragment/script :: scriptFragment"></th:block>
+		<th:block layout:fragment="script"></th:block>
+	</div>
+</body>
+</html>

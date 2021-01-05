@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html layout:decorator="thymeleaf/layout/layout_blank">
+<head>
+<title layout:title-pattern="$LAYOUT_TITLE : $CONTENT_TITLE">[(#{title.contract})] - [(#{title.update})]</title>
+</head>
+<body>
+	<div layout:fragment="content">
+		<section class="content">
+			<div class="container-fluid">
+				<div class="row mt-2">
+					<div class="col-lg-12">
+						<div class="card card-primary card-outline">
+							<div class="card-header">
+								<h5 class="card-title m-0" data-th-text="#{title.update}"></h5>
+							</div>
+							<div class="card-body">
+								<form id="input-form">
+									<div class="row">
+										<div class="col-sm-4">
+											<!-- text input -->
+											<div class=" form-group">
+												<label for="RESOURCE_TYPE_CD">[(#{label.resource.resourceType})] <i class="fas fa-check text-danger"></i></label>
+												<select id="RESOURCE_TYPE_CD" name="RESOURCE_TYPE_CD"
+													class="form-control select2" required="required" disabled="disabled">
+													<option value="" selected="selected" 
+														data-th-text="#{label.common.all}"></option>
+													<option data-th-each="resourceType : ${resourceTypeCdList}" data-th-value="${resourceType.CODE_ID}" data-th-text="${resourceType.CODE_NM}"></option>	
+												</select>
+											</div>
+										</div>
+										
+										<div class="col-sm-4">
+											<!-- text input -->
+											<div class=" form-group">
+												<label for="TOWER_TYPE_CD">[(#{label.resource.towerType})] <i class="fas fa-check text-danger"></i></label>
+												<select id="TOWER_TYPE_CD" name="TOWER_TYPE_CD"
+													class="form-control select2" required="required" disabled="disabled">
+													<option value="" selected="selected" 
+														data-th-text="#{label.common.all}"></option>
+													<option data-th-each="towerType : ${towerTypeCdList}" data-th-value="${towerType.CODE_ID}" data-th-text="${towerType.CODE_NM}"></option>	
+												</select>
+											</div>
+										</div>
+										
+										<div class="col-sm-4">
+											<!-- text input -->
+											<div class="form-group">
+												<label for="BASELINE_ID">[(#{label.resource.baselineId})] <i class="fas fa-check text-danger"></i></label>
+												<input type="text" id="BASELINE_ID" name="BASELINE_ID" class="form-control" required="required" data-th-value="${BASELINE_ID}" readonly="readonly">
+											</div>
+										</div>
+									</div>
+									<div class="row">
+										<div class="col-sm-4">
+											<!-- text input -->
+											<div class=" form-group">
+												<label for="REPORT_CATEGORY_CD">[(#{label.resource.reportCategory})] <i class="fas fa-check text-danger"></i></label>
+												<select id="REPORT_CATEGORY_CD" name="REPORT_CATEGORY_CD"
+													class="form-control select2" required="required" disabled="disabled">
+													<option value="" selected="selected"
+														data-th-text="#{label.common.all}"></option>
+													<option data-th-each="reportCategory : ${reportCategoryCdList}" data-th-value="${reportCategory.CODE_ID}" data-th-text="${reportCategory.CODE_NM}"></option>	
+												</select>
+											</div>
+										</div>
+										<div class="col-sm-4">
+											<!-- text input -->
+											<div class=" form-group">
+												<label for="RESOURCE_CATEGORY_CD">[(#{label.resource.resourceCategory})] <i class="fas fa-check text-danger"></i></label>
+												<select id="RESOURCE_CATEGORY_CD" name="RESOURCE_CATEGORY_CD"
+													class="form-control select2" required="required" disabled="disabled">
+													<option value="" selected="selected"
+														data-th-text="#{label.common.all}"></option>
+													<option data-th-each="resourceCategory : ${resourceCategoryCdList}" data-th-value="${resourceCategory.CODE_ID}" data-th-text="${resourceCategory.CODE_NM}"></option>	
+												</select>
+											</div>
+										</div>
+									</div>
+									<div class="row">
+										<div class="col-sm-4">
+											<!-- text input -->
+											<div class="form-group">
+												<label for="UNITS">[(#{label.resource.units})] <i class="fas fa-check text-danger"></i></label>
+												<input type="text" id="UNITS" name="UNITS" class="form-control" required="required">
+											</div>
+										</div>
+										<div class="col-sm-4">
+											<!-- text input -->
+											<div class="form-group">
+												<label for="ORDER_NO">[(#{label.resource.orderNo})] <i class="fas fa-check text-danger"></i></label>
+												<input type="number" id="ORDER_NO" name="ORDER_NO" class="form-control" required="required">
+											</div>
+										</div>
+									</div>
+								</form>
+							</div>
+							<div class="card-footer">
+								<div class="row">
+									<div class="col-sm-12">
+										<div class="text-center">
+											<button type="button" class="btn btn-sm btn-primary" data-action-button="validate" data-th-text="#{button.update}"></button>
+											<button type="button" class="btn btn-sm btn-outline-primary" data-action-button="cancel" data-th-text="#{button.cancel}"></button>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<!-- /.col-lg-12 -->
+				</div>
+				<!-- /.row -->
+			</div>
+		</section>
+	</div>
+
+	<th:block layout:fragment="script">
+		<script>
+			$(function() {
+				var form = $("#input-form");
+				var validator = form.validate();
+				
+				
+				// 계약구분
+				$('select[name="RESOURCE_TYPE_CD"]').createSelectBox();
+				
+				// 타워구분
+				$('select[name="TOWER_TYPE_CD"]').createSelectBox({
+					code_id : 'TOWER_TYPE'
+				});
+				
+				// 리포트 카테고리
+				$('select[name="REPORT_CATEGORY_CD"]').createSelectBox({
+					code_id : 'REPORT_CATEGORY'
+				});
+				
+				// 리소스 카테고리
+				$('select[name="RESOURCE_CATEGORY_CD"]').createSelectBox({
+					code_id : 'RESOURCE_CATEGORY'
+				});
+				// 프로세스 처리 함수
+				$.fn.executeAction = function(procType) {
+					switch(procType) {
+						case 'init' :
+							// 폼 데이터 셋팅
+							var formData = new FormData(form[0]);
+							$.sendData({
+								url: '/bill/resource/findData',
+								//data:formData,
+								data: {
+									BASELINE_ID: '[(${BASELINE_ID})]'
+								},
+							}, function(result) {
+								$(form).find('[name="RESOURCE_TYPE_CD"]').val(result['RESOURCE_TYPE_CD']).trigger('change');
+								$(form).find('[name="TOWER_TYPE_CD"]').val(result['TOWER_TYPE_CD']).trigger('change');
+								$(form).find('[name="REPORT_CATEGORY_CD"]').val(result['REPORT_CATEGORY_CD']).trigger('change');
+								$(form).find('[name="RESOURCE_CATEGORY_CD"]').val(result['RESOURCE_CATEGORY_CD']).trigger('change');
+								//$(form).find('[name="BASELINE_ID"]').val(result['BASELINE_ID']);
+								$(form).find('[name="UNITS"]').val(result['UNITS']);
+								$(form).find('[name="ORDER_NO"]').val(result['ORDER_NO']);
+							});
+							
+							break;
+						case 'validate' :	// 정합성 체크
+							if(form.valid()) {
+								$.fn.executeAction('update');
+							}
+							
+							break;
+						case 'update' :		// 등록
+							var formData = new FormData(form[0]);
+							
+							// 폼 데이터 전송
+							$.sendData({
+								url: '/bill/resource/updateData',
+								data: formData,
+								notification: true,
+								isIframe: true
+							}, function(data) {
+								if(data.result == 'S') {
+									parent.$('#list').get(0).contentWindow.location.reload();
+									
+									$.fn.executeAction('cancel');
+								}
+							});
+							
+							break;
+						case 'cancel' :		// 취소
+							var activeTab = parent.tabsComp.tabs('getSelected');
+							var activeIdx = parent.tabsComp.tabs('getTabIndex', activeTab);
+							parent.tabsComp.tabs('close', activeIdx);
+						
+							break;
+						default :
+							;
+					}
+				}
+				
+				// 버튼 이벤트
+				$('[data-action-button]').on('click', function() {
+					$(this).executeAction($(this).data('action-button'));
+				});
+				
+				$.fn.executeAction('init');
+			});
+		</script>
+	</th:block>
+</body>
+</html>

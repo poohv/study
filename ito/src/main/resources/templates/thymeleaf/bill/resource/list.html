@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html layout:decorator="thymeleaf/layout/layout_blank">
+<head>
+<title layout:title-pattern="$LAYOUT_TITLE : $CONTENT_TITLE">[(#{title.resource})] - [(#{title.list})]</title>
+</head>
+<body>
+	<div layout:fragment="content">
+	<input type="hidden" id="SEQ" name="SEQ" class="form-control" required="required">
+		<section class="content">
+			<div class="container-fluid mt-2">
+				<div class="row">
+					<div class="col-lg-12">
+						<div class="card card-primary card-outline">
+							<div class="card-header">
+								<h5 class="card-title m-0" data-th-text="#{title.search}"></h5>
+							</div>
+							<div class="card-body">
+								<form id="search-form" class="form-horizontal">
+									<div class="row">
+										<div class="col-sm-4">
+											<!-- text input -->
+											<div class="form-group row">
+												<label for="RESOURCE_TYPE_CD" class="col-sm-4 col-form-label" data-th-text="#{label.resource.resourceType}"></label>
+												<div class="col-sm-8">
+													<select id="RESOURCE_TYPE_CD" name="RESOURCE_TYPE_CD"
+														class="form-control select2">
+														<option value="" selected="selected"
+															data-th-text="#{label.common.all}"></option>
+													</select>
+												</div>
+											</div>
+										</div>
+<!-- 										<div class="col-sm-4"> -->
+<!-- 											text input -->
+<!-- 											<div class="form-group row"> -->
+<!-- 												<label for="TOWER_TYPE_CD" class="col-sm-4 col-form-label" data-th-text="#{label.resource.towerType}"></label> -->
+<!-- 												<div class="col-sm-8"> -->
+<!-- 													<select id="TOWER_TYPE_CD" name="TOWER_TYPE_CD" -->
+<!-- 														class="form-control select2"> -->
+<!-- 														<option value="" selected="selected" -->
+<!-- 															data-th-text="#{label.common.all}"></option> -->
+<!-- 													</select> -->
+<!-- 												</div> -->
+<!-- 											</div> -->
+<!-- 										</div> -->
+<!-- 										<div class="col-sm-4"> -->
+<!-- 											text input -->
+<!-- 											<div class="form-group row"> -->
+<!-- 												<label for="REPORT_CATEGORY_CD" class="col-sm-4 col-form-label" data-th-text="#{label.resource.reportCategory}"></label> -->
+<!-- 												<div class="col-sm-8"> -->
+<!-- 													<select id="REPORT_CATEGORY_CD" name="REPORT_CATEGORY_CD" -->
+<!-- 														class="form-control select2"> -->
+<!-- 														<option value="" selected="selected" -->
+<!-- 															data-th-text="#{label.common.all}"></option> -->
+<!-- 													</select> -->
+<!-- 												</div> -->
+<!-- 											</div> -->
+<!-- 										</div> -->
+									</div>
+									<div class="row">
+										<div class="col-sm-12">
+											<div class="text-center">
+												<button type="submit" class="btn btn-sm btn-primary" data-th-text="#{button.search}"></button>
+												<button type="button" class="btn btn-sm btn-outline-primary" data-action-button="reset" data-th-text="#{button.reset}"></button>
+											</div>
+										</div>
+									</div>
+								</form>
+							</div>
+						</div>
+					</div>
+					<!-- /.col-lg-12 -->
+				</div>
+				<!-- /.row -->
+
+				<div class="row">
+					<div class="col-lg-12">
+						<div class="card card-primary card-outline">
+							<div class="card-header">
+								<h3 class="card-title" data-th-text="#{title.list}"></h3>
+								<div class="card-tools">
+									<button type="button" class="btn btn-sm btn-success" data-action-button="new">[(#{button.new})]</button>
+									<button type="button" class="btn btn-sm btn-success" data-action-button="order">[(#{button.order})]</button>
+								</div>
+							</div>
+							<!-- /.card-header -->
+							<div class="card-body">
+								<table id="dataTable" class="table table-sm table-bordered table-hover table-striped">
+									<thead>
+										<tr>
+											<th data-th-text="#{label.resource.resourceType}"></th>
+											<th data-th-text="#{label.resource.towerType}"></th>
+											<th data-th-text="#{label.resource.reportCategory}"></th>
+											<th data-th-text="#{label.resource.resourceCategory}"></th>
+											<th data-th-text="#{label.resource.units}"></th>
+											<th data-th-text="#{label.resource.baselineId}"></th>
+											<th data-th-text="#{label.resource.orderNo}"></th>
+										</tr>
+									</thead>
+								</table>
+							</div>
+							<!-- /.card-body -->
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+	</div>
+
+	<th:block layout:fragment="script">
+		<script>
+			$(function() {
+				var form = $("#search-form");
+				var validator = form.validate();
+				var selectedRowData;
+				
+				$("#SEQ").val("");
+				
+				// 공통코드 콤보박스 생성
+				$('select[name="RESOURCE_TYPE_CD"]').createSelectBox({
+					code_id : 'RESOURCE_TYPE'
+				});
+				
+				$('select[name="TOWER_TYPE_CD"]').createSelectBox({
+					code_id : 'TOWER_TYPE'
+				});
+				
+				$('select[name="REPORT_CATEGORY_CD"]').createSelectBox({
+					code_id : 'REPORT_CATEGORY'
+				});
+
+				// 조회결과 테이블 생성
+				var dataTable = $('#dataTable').createDataTable({
+						url: _ctx + "/bill/resource/dataList",
+						bPaginate: false,
+						dom : 'B<"float-right"i>frt',
+						params: {},
+						columns: [
+							{data : "RESOURCE_TYPE_CD_NM"},
+							{data : "TOWER_TYPE_CD_NM"},
+							{data : "REPORT_CATEGORY_CD_NM"},
+							{data : "RESOURCE_CATEGORY_CD_NM"},
+							{data : "UNITS"},
+							{data : "BASELINE_ID"},
+							{data : "ORDER_NO"}
+						],
+						columnDefs: [
+							{
+								targets: [0],
+								className: 'text-center',
+								render: function ( data, type, full ) {
+									return '<span>'+data+'</span><input type="hidden" name="BASELINE_ID" value="'+full['BASELINE_ID']+'">';
+								}
+							},
+							{
+								targets: [1],
+								className: 'text-center'
+							},							
+							{
+								targets: [2],
+								className: 'text-center'
+							},
+							{
+								targets: [3],
+								className: 'text-center'
+							},							
+							{
+								targets: [4],
+								className: 'text-center'
+							},							
+							{
+								targets: [5],
+								visible: false
+							},
+							{
+								targets: [6],
+								visible: false
+							}
+						],
+						callback : function(){
+							$('#dataTable tbody').sortable({
+								placeholder : "bg-warning"
+							}); 
+						}
+				});
+				
+				// 폼 전송 이벤트
+				form.submit(function(e) {
+				    e.preventDefault();
+				    $.fn.executeAction('search');
+				});
+				
+				// 프로세스 처리 함수
+				$.fn.executeAction = function(procType) {
+					switch(procType) {
+						case 'reset' :		// 조회조건 초기화
+							form[0].reset();
+							form.find("select").trigger("change");
+							break;
+						case 'new' :		// 신규
+							parent.tabsComp.createTabs({
+								id: 'new',
+								title: '[(#{button.new})]',
+								isIframe: true,
+								url: _ctx + '/bill/resource/regist',
+								method: 'add',
+								closable: true
+							});
+						
+							break;
+						case 'update' :		// 수정
+							parent.tabsComp.createTabs({
+								id: 'update_' + selectedRowData['BASELINE_ID'],
+								title: selectedRowData['BASELINE_ID'],
+								isIframe: true,
+								url: _ctx + '/bill/resource/update',
+								method: 'add',
+								closable: true,
+								sendData: {
+									BASELINE_ID: selectedRowData['BASELINE_ID']
+								}
+							});
+							break;
+						case 'search' :
+							var dataTableParams = form.serialize();
+							$("#SEQ").val(1);
+					    	dataTable.ajax.url(_ctx + '/bill/resource/dataList?' + dataTableParams).draw();
+							break;
+						case 'order' :
+							if($('select[name="RESOURCE_TYPE_CD"]').val() == "" || $('#SEQ').val() != 1){
+								
+									alert("리소스타입으로 조회 후 변경 가능합니다.");
+									return;
+							}
+							
+							var dataArrayBaseId = [];
+							var dataArrayOrderNo = [];
+							
+							$('#dataTable [name="BASELINE_ID"]').each(function(idx, element) {
+									console.log(idx + ' : ' + $(this).val());
+									dataArrayOrderNo.push($(this).val());
+							});
+							
+							// 폼 데이터 전송
+							$.sendData({
+								url: '/bill/resource/updateOrderNo',
+								data: dataArrayOrderNo,
+								notification: true,
+								isIframe: true
+							}, function(data) {
+								if(data.result == 'S') {
+									var dataTableParams = form.serialize();
+									$("#SEQ").val(1);
+							    	dataTable.ajax.url(_ctx + '/bill/resource/dataList?' + dataTableParams).draw();
+								}
+							});
+							
+							break;
+						default :
+							;
+					}
+				}
+				
+				// 버튼 이벤트
+				$('[data-action-button]').on('click', function() {
+					$(this).executeAction($(this).data('action-button'));
+				});
+				
+				// 목록 더블클릭 이벤트
+				$('#dataTable tbody').on('dblclick', 'tr', function() {
+					selectedRowData = dataTable.row(this).data();
+					
+					if(selectedRowData) {
+						$.fn.executeAction('update');
+					}
+				});
+				
+			});
+		</script>
+	</th:block>
+</body>
+</html>

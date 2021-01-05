@@ -1,0 +1,750 @@
+package kr.co.kyobo.bill.detail.controller;
+
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellType;
+import org.apache.poi.ss.usermodel.DateUtil;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.WorkbookFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.core.env.Environment;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.util.StringUtils;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
+
+import kr.co.kyobo.bill.resource.service.ResourceService;
+import kr.co.kyobo.common.service.CommonCodeService;
+import kr.co.kyobo.common.service.SftpService;
+import lombok.extern.slf4j.Slf4j;
+
+/**
+ * 세부내역 업로드 컨트롤러
+ * <pre>
+ * <b>이력:</b>
+ * 		2020. 7. 2. 최초작성 - 김태연
+ * </pre>
+ *
+ * @author 김태연
+ * @version 1.0 최초작성
+ */
+@Controller
+@Slf4j
+@PropertySource(value = {"classpath:bill.properties"}, encoding = "UTF-8")
+public class DetailUploadController {
+	
+	@Autowired
+	private SftpService sftpService;
+	
+	@Autowired
+	private MessageSource messageSource;
+	
+	@Autowired
+	private Environment environment;
+	
+	@Autowired
+	private CommonCodeService commonCodeService;
+	
+	@Autowired
+	private ResourceService resourceService;
+	
+	/**
+	 * 인덱스 화면 호출
+	 * @param model
+	 * @return
+	 */
+	@RequestMapping("/bill/detailUpload/index")
+	public String indexPage(Model model) {
+		return "thymeleaf/bill/detailUpload/index";
+	}
+	
+	/**
+	 * 목록 화면 호출
+	 * @param model
+	 * @return
+	 */
+	@RequestMapping("/bill/detailUpload/list")
+	public String listPage(Model model) {
+		return "thymeleaf/bill/detailUpload/list";
+	}
+	
+	/**
+	 * 등록화면 호출
+	 * @param model
+	 * @return
+	 */
+	@RequestMapping("/bill/detailUpload/regist")
+	public String registPage(Model model) {
+		return "thymeleaf/bill/detailUpload/regist";
+	}
+	
+	/**
+	 * 수정화면 호출
+	 * @param model
+	 * @return
+	 */
+	@RequestMapping("/bill/detailUpload/update")
+	public String updatePage(@RequestParam Map<String, Object> params, Model model) {
+		Map<String, Object> conditions = new HashMap<String, Object>();
+		
+		conditions.put("DOMAINID", "CONTRACT_TYPE");
+		model.addAttribute("contractTypeCdList", commonCodeService.findCodeList(conditions));
+		model.addAllAttributes(params);
+		
+		return "thymeleaf/bill/detailUpload/update";
+	}
+	
+	@ResponseBody
+	@RequestMapping("/bill/detailUpload/upload")
+	public Map<String, Object> findDataList(@RequestParam Map<String, Object> params
+			, MultipartHttpServletRequest request
+			, Authentication authentication) throws IOException {
+		Map<String, Object> resultMap = new HashMap<String, Object>();
+		resultMap.put("result", messageSource.getMessage("msg.result.success", null, null));
+		
+		String billMonth = "";
+		if (!StringUtils.isEmpty(params.get("BILL_MONTH"))) {
+			billMonth = params.get("BILL_MONTH").toString().replace("/", "");
+		}
+		
+		Map<String, MultipartFile> fileMap = request.getFileMap();
+		
+		FileInputStream fis = null;
+		Workbook wb = null;
+		String filePassword = "";
+		
+		if(!StringUtils.isEmpty(params.get("BILL_FILE_PASSWORD"))) {
+			filePassword = params.get("BILL_FILE_PASSWORD").toString();
+		}
+		
+		fis = (FileInputStream)fileMap.get("BILL_FILE").getInputStream();
+		wb = WorkbookFactory.create(fis, filePassword);			
+		
+		// 세부내역 시트명
+		String billSheetName = environment.getProperty("excel.bill.sheet.name");
+		String billHeader = environment.getProperty("excel.bill.header");
+		String billColumn = environment.getProperty("excel.bill.column");
+		String billTargetCheckType = environment.getProperty("excel.bill.sheet.target.check.type");
+		String billTargetCheckHeader = environment.getProperty("excel.bill.sheet.target.check.header");
+		int billHeaderRowNum = Integer.parseInt(environment.getProperty("excel.bill.sheet.header.rownum"));
+		boolean isExistUsageMonth = false;
+		String[] cellColumnArr = billColumn.split(",");
+		String[] cellHeaderArr = billHeader.split(",");
+		int[] cellIdxArr = new int[cellHeaderArr.length]; 
+		
+		Sheet sheet = wb.getSheet(billSheetName);
+		
+		List<Map<String, Object>> dataList = new ArrayList<Map<String, Object>>();
+
+		if (sheet != null) {
+			int lastRowNum = sheet.getLastRowNum();
+			
+			//헤더 인덱스 추출
+			Row headerRow = sheet.getRow(billHeaderRowNum);
+			int headerLastCellNum = headerRow.getLastCellNum();
+			
+			// 헤더 중복 체크
+			boolean isDupleHeader = false;
+			for(int h=0; h<headerLastCellNum; h++) {
+				Cell hCell = headerRow.getCell(h);
+				
+				for(int hh=0; hh<headerLastCellNum; hh++) {
+					Cell hhCell = headerRow.getCell(hh);
+					
+					if(h == hh) {
+						continue;
+					}
+					
+					if(StringUtils.isEmpty(hCell.toString())
+							|| StringUtils.isEmpty(hhCell.toString())) {
+						continue;
+					}
+					
+					if(hCell.toString().equals(hhCell.toString())) {
+						isDupleHeader = true;
+						break;
+					}
+				}
+				
+				if(isDupleHeader) {
+					break;
+				}
+			}
+			
+			// 헤더 중복 확인
+			if(isDupleHeader) {
+				resultMap.put("result", messageSource.getMessage("msg.result.fail", null, null));
+				resultMap.put("resultMsg", messageSource.getMessage("msg.file.upload.duple.header", null, null));
+				
+				wb.close();
+				fis.close();
+				
+				return resultMap;
+			}
+
+			for(int i=0; i<headerLastCellNum; i++) {
+//			for(int i=0; i<37; i++) {
+				Cell headerCell = headerRow.getCell(i);
+				String headerName = "";
+				
+				if(CellType.NUMERIC == headerCell.getCellType()) {
+					if("m\"월\"".equals(headerCell.getCellStyle().getDataFormatString())) {
+						Date date = (Date)headerCell.getDateCellValue();
+						Calendar cal = Calendar.getInstance();
+						cal.setTime(date);
+						cal.add(Calendar.MONTH, 1);
+						SimpleDateFormat df = new SimpleDateFormat("yyyyMM");
+						
+						if(billMonth.equals(df.format(cal.getTime()))) {
+							headerName = "사용량";
+							isExistUsageMonth = true;
+						}
+					}
+				} else if(CellType.STRING == headerCell.getCellType()) {
+					headerName = headerCell.getStringCellValue();
+				}
+				
+				// 헤더의 인덱스 추출
+				for (int j=0; j<cellHeaderArr.length; j++) {
+					if(headerName.equals(cellHeaderArr[j])) {
+						if("요율".equals(headerName)) {
+							cellIdxArr[j] = i;
+							cellIdxArr[++j] = (i + 2);
+							break;
+						} else if("서비스일수".equals(headerName)) {
+							cellIdxArr[j] = (i + 1);
+							cellIdxArr[++j] = (i + 3);
+							break;
+						} else {
+							cellIdxArr[j] = i;
+							break;
+						}
+					}
+				}
+			}
+			
+			// 월 데이터 존재 여부 확인
+			if(!isExistUsageMonth) {
+				resultMap.put("result", messageSource.getMessage("msg.result.fail", null, null));
+				resultMap.put("resultMsg", messageSource.getMessage("msg.file.upload.empty.month.data"
+						, new Object[] {params.get("BILL_MONTH").toString()}
+						, null));
+				
+				wb.close();
+				fis.close();
+				
+				return resultMap;
+			}
+			
+			// 데이터 추출
+			for(int k=0; k<lastRowNum; k++) {
+				Row row = sheet.getRow(k);
+				
+				if (k > 1) {
+					boolean isBillData = false;
+					
+					for(int t=0; t<row.getLastCellNum(); t++) {
+						Cell targetCheckCell = row.getCell(t);
+						if(targetCheckCell != null) {
+							
+							if(billTargetCheckType.equals(targetCheckCell.toString())) {
+								isBillData = true;
+								break;
+							}
+						}
+					}
+					
+					Map<String, Object> dataMap = new HashMap<String, Object>();
+					dataMap.put("BILL_MONTH_SEQ", k);
+					
+					UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+					dataMap.put("REG_USER_ID", userDetails.getUsername());
+					
+					// 수집 대상 행일 경우
+					if(isBillData) {
+						for (int j=0; j<cellHeaderArr.length; j++) {
+							Cell tCell = row.getCell(cellIdxArr[j]);
+							
+							if(tCell != null) {
+								if(CellType.NUMERIC == tCell.getCellType()) {
+									// 날짜 일 경우
+									if(DateUtil.isCellDateFormatted(tCell)) {
+										Date date = (Date)tCell.getDateCellValue();
+										SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+										
+										dataMap.put(cellColumnArr[j], df.format(date));
+									} else {
+										// 백분율 일 경우
+										if(tCell.getCellStyle().getDataFormatString().contains("%")) {
+											dataMap.put(cellColumnArr[j], (tCell.getNumericCellValue() * 100));
+										} else {
+											dataMap.put(cellColumnArr[j], tCell.getNumericCellValue());
+										}
+									}
+								} else if(CellType.STRING == tCell.getCellType()) {
+									dataMap.put(cellColumnArr[j], tCell.getStringCellValue());
+								} else if(CellType.FORMULA == tCell.getCellType()) {
+									if(CellType.NUMERIC == tCell.getCachedFormulaResultType()) {
+										dataMap.put(cellColumnArr[j], Math.round(tCell.getNumericCellValue() * 1000) / 1000.0);
+									} else if (CellType.STRING == tCell.getCachedFormulaResultType()) {
+										dataMap.put(cellColumnArr[j], tCell.getRichStringCellValue().toString());
+									}
+								}
+							}
+							
+							if(StringUtils.isEmpty(dataMap.get(cellColumnArr[j]))) {
+								dataMap.put(cellColumnArr[j], "");
+							}
+						}
+						
+						dataMap.put("BILL_MONTH", billMonth);
+						
+						// ASC 일 경우
+						if("ASC".equals(dataMap.get("CHARGE_TYPE_CD"))
+								&& !StringUtils.isEmpty(dataMap.get("AMOUNT"))) {
+							Double amount = (Double)dataMap.get("AMOUNT");
+							
+							if(amount != 0) {
+								dataList.add(dataMap);
+							}
+						} else {
+							if(!StringUtils.isEmpty(dataMap.get("USAGE"))
+									&& !StringUtils.isEmpty(dataMap.get("AMOUNT"))) {
+								Double usage = (Double)dataMap.get("USAGE");
+								Double amount = (Double)dataMap.get("AMOUNT");
+								
+								if(usage != 0 && amount != 0) {
+									dataList.add(dataMap);
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+		
+		wb.close();
+		fis.close();
+		
+		validate(dataList);
+		resultMap.put("dataList", dataList);
+		
+		return resultMap;
+	}
+	
+	private void validate(List<Map<String, Object>> dataList) {
+		String billType = environment.getProperty("excel.bill.type");
+		String billColumn = environment.getProperty("excel.bill.column");
+		String billHeader = environment.getProperty("excel.bill.header");
+		String billRequired = environment.getProperty("excel.bill.required");
+		String billConditionsRequired = environment.getProperty("excel.bill.conditions.required");
+		
+		String[] billTypeArr = billType.split(",");
+		String[] billColumnArr = billColumn.split(",");
+		String[] billHeaderArr = billHeader.split(",");
+		String[] billRequiredArr = billRequired.split(",");
+		String[] billConditionsRequiredArr = billConditionsRequired.split(",");
+		String inValid = "bg-danger";
+		String suffix = "_NM";
+		String suffixValid = "-VALID";
+		String suffixMsg = "-MSG";
+		
+		Map<String, String> headerMap = new HashMap<String, String>();
+		
+		for(int m=0; m<billColumnArr.length; m++) {
+			headerMap.put(billColumnArr[m], billHeaderArr[m]);
+		}
+		
+		Map<String, Object> conditions = new HashMap<String, Object>();
+		
+		for(int i=0; i<dataList.size(); i++) {
+			Map<String, Object> map = dataList.get(i);
+			String contractTypeCd = "";
+			String chargeTypeCd = "";
+			String resourceTypeCd = "";
+			String towerTypeCd = "";
+			long amount = 0;
+			int rowNum = (int)map.get("BILL_MONTH_SEQ");
+			
+			if(StringUtils.isEmpty(map.get("CHARGE_TYPE_CD"))) {
+				map.put("CONTRACT_TYPE_CD", "");
+				map.put("CONTRACT_TYPE_CD" + suffix, "");
+			} else {
+				contractTypeCd = map.get("CONTRACT_TYPE_CD").toString();
+				
+				conditions.clear();
+				conditions.put("DOMAINID", "CONTRACT_TYPE");
+				conditions.put("CODE_NM", contractTypeCd);
+				Map<String, Object> resultMap = null;
+				
+				if(!StringUtils.isEmpty(contractTypeCd)) {
+					resultMap = commonCodeService.findCode(conditions);
+				}
+				
+				if(resultMap == null) {
+					map.put("CONTRACT_TYPE_CD", "");
+					map.put("CONTRACT_TYPE_CD" + suffix, contractTypeCd);
+				} else {
+					map.put("CONTRACT_TYPE_CD", resultMap.get("CODE_ID"));
+					map.put("CONTRACT_TYPE_CD" + suffix, resultMap.get("CODE_NM"));
+				}
+			}
+			
+			if(StringUtils.isEmpty(map.get("CHARGE_TYPE_CD"))) {
+				map.put("CHARGE_TYPE_CD", "");
+				map.put("CHARGE_TYPE_CD" + suffix, "");
+			} else {
+				chargeTypeCd = map.get("CHARGE_TYPE_CD").toString();
+				
+				conditions.clear();
+				conditions.put("DOMAINID", "CHARGE_TYPE");
+				conditions.put("CODE_NM", chargeTypeCd);
+				Map<String, Object> resultMap = null;
+				
+				if(!StringUtils.isEmpty(chargeTypeCd)) {
+					resultMap = commonCodeService.findCode(conditions);
+				}
+				
+				if(resultMap == null) {
+					map.put("CHARGE_TYPE_CD", "");
+					map.put("CHARGE_TYPE_CD" + suffix, chargeTypeCd);
+				} else {
+					map.put("CHARGE_TYPE_CD", resultMap.get("CODE_ID"));
+					map.put("CHARGE_TYPE_CD" + suffix, resultMap.get("CODE_NM"));
+				}
+			}
+			
+			if(StringUtils.isEmpty(map.get("BASELINE_ID"))
+					|| "*".equals(map.get("BASELINE_ID").toString())) {
+				String resourceType = (String)map.get("RESOURCE_TYPE_CD");
+				
+				if(StringUtils.isEmpty(resourceType)) {
+					map.put("RESOURCE_TYPE_CD", "");
+					map.put("RESOURCE_TYPE_CD" + suffix, "");
+				} else {
+					conditions.clear();
+					conditions.put("DOMAINID", "RESOURCE_TYPE");
+					conditions.put("CODE_NM", resourceType);
+					Map<String, Object> resultMap = commonCodeService.findCode(conditions);
+					
+					if(resultMap != null) {
+						map.put("RESOURCE_TYPE_CD", resultMap.get("CODE_ID"));
+						map.put("RESOURCE_TYPE_CD" + suffix, resultMap.get("CODE_NM"));
+					}
+				}
+				
+				String resourceCategory = (String)map.get("RESOURCE_CATEGORY_CD");
+				
+				if(StringUtils.isEmpty(resourceCategory)) {
+					map.put("RESOURCE_CATEGORY_CD", "");
+					map.put("RESOURCE_CATEGORY_CD" + suffix, "");
+				} else {
+					conditions.clear();
+					conditions.put("DOMAINID", "RESOURCE_CATEGORY");
+					conditions.put("CODE_NM", resourceCategory);
+					Map<String, Object> resultMap = commonCodeService.findCode(conditions);
+					
+					if(resultMap != null) {
+						map.put("RESOURCE_CATEGORY_CD", resultMap.get("CODE_ID"));
+						map.put("RESOURCE_CATEGORY_CD" + suffix, resultMap.get("CODE_NM"));
+					}
+				}
+				
+				String reportCategory = (String)map.get("REPORT_CATEGORY_CD");
+				
+				if(StringUtils.isEmpty(reportCategory)) {
+					map.put("REPORT_CATEGORY_CD", "");
+					map.put("REPORT_CATEGORY_CD" + suffix, "");
+				} else {
+					conditions.clear();
+					conditions.put("DOMAINID", "REPORT_CATEGORY");
+					conditions.put("CODE_NM", reportCategory);
+					Map<String, Object> resultMap = commonCodeService.findCode(conditions);
+					
+					if(resultMap != null) {
+						map.put("REPORT_CATEGORY_CD", resultMap.get("CODE_ID"));
+						map.put("REPORT_CATEGORY_CD" + suffix, resultMap.get("CODE_NM"));
+					}
+				}
+			} else {
+				conditions.clear();
+				conditions.put("BASELINE_ID", map.get("BASELINE_ID"));
+				Map<String, Object> resultMap = resourceService.findOne(conditions);
+				
+				if(resultMap == null) {
+					map.put("RESOURCE_TYPE_CD", "");
+					map.put("RESOURCE_TYPE_CD" + suffix, resourceTypeCd);
+					
+					map.put("RESOURCE_CATEGORY_CD", "");
+					map.put("RESOURCE_CATEGORY_CD" + suffix, "");
+					
+					map.put("REPORT_CATEGORY_CD", "");
+					map.put("REPORT_CATEGORY_CD" + suffix, "");
+				} else {
+					map.put("RESOURCE_TYPE_CD", resultMap.get("RESOURCE_TYPE_CD"));
+					map.put("RESOURCE_TYPE_CD" + suffix, resultMap.get("RESOURCE_TYPE_CD" + suffix));
+					
+					map.put("RESOURCE_CATEGORY_CD", resultMap.get("RESOURCE_CATEGORY_CD"));
+					map.put("RESOURCE_CATEGORY_CD" + suffix, resultMap.get("RESOURCE_CATEGORY_CD" + suffix));
+					
+					map.put("REPORT_CATEGORY_CD", resultMap.get("REPORT_CATEGORY_CD"));
+					map.put("REPORT_CATEGORY_CD" + suffix, resultMap.get("REPORT_CATEGORY_CD" + suffix));
+				}
+			}
+			
+			if(StringUtils.isEmpty(map.get("TOWER_TYPE_CD"))) {
+				map.put("TOWER_TYPE_CD", "");
+				map.put("TOWER_TYPE_CD" + suffix, "");
+			} else {
+				towerTypeCd = map.get("TOWER_TYPE_CD").toString();
+				
+				conditions.clear();
+				conditions.put("DOMAINID", "TOWER_TYPE");
+				conditions.put("CODE_NM", towerTypeCd);
+				Map<String, Object> resultMap = null;
+				
+				if(!StringUtils.isEmpty(towerTypeCd)) {
+					resultMap = commonCodeService.findCode(conditions);
+				}
+				
+				if(resultMap == null) {
+					map.put("TOWER_TYPE_CD", "");
+					map.put("TOWER_TYPE_CD" + suffix, towerTypeCd);
+				} else {
+					map.put("TOWER_TYPE_CD", resultMap.get("CODE_ID"));
+					map.put("TOWER_TYPE_CD" + suffix, resultMap.get("CODE_NM"));
+				}
+			}
+			
+			if(!StringUtils.isEmpty(map.get("AMOUNT"))) {
+				try {
+					amount = (long)(double)map.get("AMOUNT");
+				} catch(NumberFormatException e) {
+					amount = 0;
+				}
+			}
+			
+			// 계약구분 코드 체크
+			if(StringUtils.isEmpty(map.get("CONTRACT_TYPE_CD"))) {
+				map.put("CONTRACT_TYPE_CD" + suffixValid, inValid);
+				map.put("CONTRACT_TYPE_CD" + suffixMsg, messageSource.getMessage("msg.file.upload.not.exist.code"
+						, new Object[] {rowNum, headerMap.get("CONTRACT_TYPE_CD")}
+						, null));
+			}
+			
+			// 계약구분 명 체크
+			if(StringUtils.isEmpty(map.get("CONTRACT_TYPE_CD" + suffix))) {
+				map.put("CONTRACT_TYPE_CD" + suffix + suffixValid, inValid);
+				map.put("CONTRACT_TYPE_CD" + suffix + suffixMsg, messageSource.getMessage("msg.file.upload.required"
+						, new Object[] {rowNum, headerMap.get("CONTRACT_TYPE_CD")}
+						, null));
+			}
+			
+			// 계약번호 체크
+			if(StringUtils.isEmpty(map.get("CONTRACT_NO"))) {
+				map.put("CONTRACT_NO" + suffixValid, inValid);
+				map.put("CONTRACT_NO" + suffixMsg, messageSource.getMessage("msg.file.upload.required"
+						, new Object[] {rowNum, headerMap.get("CONTRACT_NO")}
+						, null));
+			}
+			
+			// 금액구분 코드 체크
+			if(StringUtils.isEmpty(map.get("CHARGE_TYPE_CD"))) {
+				map.put("CHARGE_TYPE_CD" + suffixValid, inValid);
+				map.put("CHARGE_TYPE_CD" + suffixMsg, messageSource.getMessage("msg.file.upload.not.exist.code"
+						, new Object[] {rowNum, headerMap.get("CHARGE_TYPE_CD")}
+						, null));
+			}
+			
+			// 금액구분 명 체크
+			if(StringUtils.isEmpty(map.get("CHARGE_TYPE_CD" + suffix))) {
+				map.put("CHARGE_TYPE_CD" + suffix + suffixValid, inValid);
+				map.put("CHARGE_TYPE_CD" + suffix + suffixMsg, messageSource.getMessage("msg.file.upload.required"
+						, new Object[] {rowNum, headerMap.get("CHARGE_TYPE_CD")}
+						, null));
+			}
+			
+			// 타워구분 코드 체크
+			if(StringUtils.isEmpty(map.get("TOWER_TYPE_CD"))) {
+				map.put("TOWER_TYPE_CD" + suffixValid, inValid);
+				map.put("TOWER_TYPE_CD" + suffixMsg, messageSource.getMessage("msg.file.upload.not.exist.code"
+						, new Object[] {rowNum, headerMap.get("TOWER_TYPE_CD")}
+						, null));
+			}
+			
+			// 타워구분 명 체크
+			if(StringUtils.isEmpty(map.get("TOWER_TYPE_CD" + suffix))) {
+				map.put("TOWER_TYPE_CD" + suffix + suffixValid, inValid);
+				map.put("TOWER_TYPE_CD" + suffix + suffixMsg, messageSource.getMessage("msg.file.upload.required"
+						, new Object[] {rowNum, headerMap.get("TOWER_TYPE_CD")}
+						, null));
+			}
+			
+			// 금액구분이 [ASC]일 경우
+			if("001".equals(map.get("CHARGE_TYPE_CD"))) {
+//				// ######################################## 테스트
+//				if("002".equals(map.get("TOWER_TYPE_CD"))
+//						|| "004".equals(map.get("TOWER_TYPE_CD"))) {
+//					map.put("TOWER_TYPE_CD", "");
+//					map.put("TOWER_TYPE_CD" + suffix, "");
+//					
+//					map.put("CONTRACT_TYPE_CD", "");
+//					map.put("CONTRACT_TYPE_CD" + suffix, "");
+//				}
+				
+				map.put("BASELINE_ID", map.get("TOWER_TYPE_CD"));
+			// 금액구분이 [ARC, RRC]일 경우
+			} else if("002".equals(map.get("CHARGE_TYPE_CD").toString())
+					|| "003".equals(map.get("CHARGE_TYPE_CD").toString())) {
+			
+//				// ############################################## 테스트
+//				if("002".equals(map.get("RESOURCE_TYPE_CD"))) {
+//					if(i == 26 || i == 29)
+//					map.put("USAGE_TPMC", "");
+//				}
+//				if("WINTEL CPU".equals(map.get("REPORT_CATEGORY_CD_NM"))
+//						|| "UNIX CPU".equals(map.get("REPORT_CATEGORY_CD_NM"))) {
+//					if(i == 22 || i == 23)
+//					map.put("USAGE_TPMC", "");
+//				}
+				
+				for(int j=0; j<billColumnArr.length; j++) {
+					boolean required = Boolean.parseBoolean(billRequiredArr[j]);
+					Object data = map.get(billColumnArr[j]);
+					
+					// 필수입력 체크
+					if(required) {
+						
+						//공통코드 일 경우
+						if("domain".equals(billTypeArr[j])) {
+							if(StringUtils.isEmpty(data)) {
+								map.put(billColumnArr[j] + suffixValid, inValid);
+								map.put(billColumnArr[j] + suffixMsg, messageSource.getMessage("msg.file.upload.required"
+										, new Object[] {rowNum, headerMap.get(billColumnArr[j])}
+										, null));
+							}
+							
+							data = map.get(billColumnArr[j] + suffix);
+							
+							if(StringUtils.isEmpty(data)) {
+								map.put(billColumnArr[j] + suffix + suffixValid, inValid);
+								map.put(billColumnArr[j] + suffix + suffixMsg, messageSource.getMessage("msg.file.upload.not.exist.code"
+										, new Object[] {rowNum, headerMap.get(billColumnArr[j])}
+										, null));
+							}
+						} else {
+							if(StringUtils.isEmpty(data)) {
+								map.put(billColumnArr[j] + suffixValid, inValid);
+								map.put(billColumnArr[j] + suffixMsg, messageSource.getMessage("msg.file.upload.required"
+										, new Object[] {rowNum, headerMap.get(billColumnArr[j])}
+										, null));
+							}
+						}
+					}
+					
+					// 숫자 체크
+					String dataType = "";
+					
+					if(billTypeArr[j] != null) {
+						dataType = billTypeArr[j];
+						
+						if(!StringUtils.isEmpty(data)) {
+						
+							if("float".equals(dataType)) {
+								try {
+									float fData = Float.parseFloat(data.toString());
+								} catch(NumberFormatException e) {
+									map.put(billColumnArr[j] + suffixValid, inValid);
+									map.put(billColumnArr[j] + suffixMsg, messageSource.getMessage("msg.file.upload.number.fail"
+											, new Object[] {rowNum, headerMap.get(billColumnArr[j])}
+											, null));
+								}
+							} else if("double".equals(dataType)) {
+								try {
+									Double dData = Double.parseDouble(data.toString());
+								} catch(NumberFormatException e) {
+									map.put(billColumnArr[j] + suffixValid, inValid);
+									map.put(billColumnArr[j] + suffixMsg, messageSource.getMessage("msg.file.upload.number.fail"
+											, new Object[] {rowNum, headerMap.get(billColumnArr[j])}
+											, null));
+								}
+							} else if("int".equals(dataType)) {
+								try {
+									int iData = Integer.parseInt(data.toString());
+								} catch(NumberFormatException e) {
+									map.put(billColumnArr[j] + suffixValid, inValid);
+									map.put(billColumnArr[j] + suffixMsg, messageSource.getMessage("msg.file.upload.number.fail"
+											, new Object[] {rowNum, headerMap.get(billColumnArr[j])}
+											, null));
+								}
+							} else if("long".equals(dataType)) {
+								try {
+									Long lData = Long.parseLong(data.toString());
+								} catch(NumberFormatException e) {
+									map.put(billColumnArr[j] + suffixValid, inValid);
+									map.put(billColumnArr[j] + suffixMsg, messageSource.getMessage("msg.file.upload.number.fail"
+											, new Object[] {rowNum, headerMap.get(billColumnArr[j])}
+											, null));
+								}
+							}
+						}
+					}
+					
+					// 입력 체크
+					if("AMOUNT".equals(billColumnArr[j])) {
+						// 합계 금액이 있을 경우
+						if(amount > 0) {
+							for(int k=0; k<billConditionsRequiredArr.length; k++) {
+								String colName = "";
+								
+								// 조건부 입력 체크
+								if(StringUtils.isEmpty(map.get(billConditionsRequiredArr[k]))) {
+									map.put(billConditionsRequiredArr[k] + suffixValid, inValid);
+									map.put(billConditionsRequiredArr[k] + suffixMsg, messageSource.getMessage("msg.file.upload.required"
+											, new Object[] {rowNum, headerMap.get(billConditionsRequiredArr[k])}
+											, null));
+								}
+							}
+							
+							// 리소스 타입이 [Server Storage]일 경우
+							if("002".equals(map.get("RESOURCE_TYPE_CD"))
+									|| "UNIX CPU".equals(map.get("REPORT_CATEGORY_CD_NM"))
+									|| "WINTEL CPU".equals(map.get("REPORT_CATEGORY_CD_NM"))) {
+								if(StringUtils.isEmpty(map.get("USAGE_TPMC"))) {
+									map.put("USAGE_TPMC" + suffixValid, inValid);
+									map.put("USAGE_TPMC" + suffixMsg, messageSource.getMessage("msg.file.upload.required"
+											, new Object[] {rowNum, headerMap.get("USAGE_TPMC")}
+											, null));
+								}
+							}
+						}
+					}
+				}
+			// 금액구분이 [ETC]일 경우
+			} else {
+				
+			}
+			
+			dataList.set(i, map);
+		}
+	}
+}

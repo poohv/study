@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.kyobo.mapper.maximo.bill.ResourceMapper">
+	<sql id="search_query">
+		SELECT *
+		FROM (
+			SELECT BASELINE_ID
+				, RESOURCE_TYPE_CD
+				, FN_GET_CODE_NM('RESOURCE_TYPE', RESOURCE_TYPE_CD) AS RESOURCE_TYPE_CD_NM
+				, TOWER_TYPE_CD
+				, FN_GET_CODE_NM('TOWER_TYPE', TOWER_TYPE_CD) AS TOWER_TYPE_CD_NM
+				, REPORT_CATEGORY_CD
+				, FN_GET_CODE_NM('REPORT_CATEGORY', REPORT_CATEGORY_CD) AS REPORT_CATEGORY_CD_NM
+				, RESOURCE_CATEGORY_CD
+				, FN_GET_CODE_NM('RESOURCE_CATEGORY', RESOURCE_CATEGORY_CD) AS RESOURCE_CATEGORY_CD_NM
+				, UNITS
+				, ORDER_NO
+				, REG_USER_ID
+				, REG_DT
+				, UPD_USER_ID
+				, UPD_DT
+			FROM TB_BILL_RESOURCE
+		)
+	</sql>
+	<sql id="search_conditions">
+		WHERE 1=1
+		<if test="BASELINE_ID != null and BASELINE_ID != ''">
+			AND BASELINE_ID = #{BASELINE_ID}
+		</if>
+		<if test="RESOURCE_TYPE_CD != null and RESOURCE_TYPE_CD != ''">
+			AND RESOURCE_TYPE_CD = #{RESOURCE_TYPE_CD}
+		</if>
+		<if test="TOWER_TYPE_CD != null and TOWER_TYPE_CD != ''">
+			AND TOWER_TYPE_CD = #{TOWER_TYPE_CD}
+		</if>
+		<if test="RESOURCE_CATEGORY_CD != null and RESOURCE_CATEGORY_CD != ''">
+			AND RESOURCE_CATEGORY_CD = #{RESOURCE_CATEGORY_CD}
+		</if>
+		<if test="RESOURCE_CATEGORY_CD_NM != null and RESOURCE_CATEGORY_CD_NM != ''">
+			AND UPPER(RESOURCE_CATEGORY_CD_NM) LIKE '%' || UPPER(#{RESOURCE_CATEGORY_CD_NM}) || '%'
+		</if>
+		ORDER BY RESOURCE_TYPE_CD, ORDER_NO ASC
+	</sql>
+	<select id="findAll" parameterType="HashMap" resultType="HashMap">
+		SELECT *
+		FROM (
+			<include refid="search_query"></include>
+			<include refid="search_conditions"></include>
+			<if test="length!=null and !length.equals('') and length > -1">
+				LIMIT ${length}
+				OFFSET ${start}
+			</if>
+		) A
+	</select>
+	
+	<select id="findCount" parameterType="HashMap" resultType="int">
+		SELECT count(*)
+		FROM (
+			<include refid="search_query"></include>
+			<include refid="search_conditions"></include>
+		) A
+	</select>
+	
+	<select id="findOne" parameterType="HashMap" resultType="HashMap">
+		SELECT *
+		FROM (
+			<include refid="search_query"></include>
+			<include refid="search_conditions"></include>
+		) A
+	</select>
+	
+	<insert id="insert" parameterType="HashMap">
+		INSERT INTO TB_BILL_RESOURCE (
+			TB_BILL_RESOURCEID
+			,BASELINE_ID
+			,RESOURCE_TYPE_CD
+			,TOWER_TYPE_CD
+			,REPORT_CATEGORY_CD
+			,RESOURCE_CATEGORY_CD
+			,UNITS
+			,ORDER_NO
+			,REG_USER_ID
+			,REG_DT
+		) VALUES (
+		 	NEXTVAL FOR TB_BILL_RESOURCEIDSEQ
+			, #{BASELINE_ID}
+			, #{RESOURCE_TYPE_CD}
+			, #{TOWER_TYPE_CD}
+			, #{REPORT_CATEGORY_CD}
+			, #{RESOURCE_CATEGORY_CD}
+			, #{UNITS}
+			, #{ORDER_NO}
+			, #{REG_USER_ID}
+			, CURRENT TIMESTAMP
+		)
+	</insert>
+	
+	<update id="update" parameterType="HashMap">
+		UPDATE TB_BILL_RESOURCE SET
+			UNITS = #{UNITS}
+			, ORDER_NO = #{ORDER_NO}
+			, UPD_USER_ID = #{UPD_USER_ID}
+			, UPD_DT = CURRENT TIMESTAMP
+		WHERE BASELINE_ID = #{BASELINE_ID}
+	</update>
+	
+	<update id="updateOrderNo" parameterType="HashMap">
+		UPDATE TB_BILL_RESOURCE SET
+			ORDER_NO = #{ORDER_NO}
+			, UPD_USER_ID = #{UPD_USER_ID}
+			, UPD_DT = CURRENT TIMESTAMP
+		WHERE BASELINE_ID = #{BASELINE_ID}
+	</update>
+</mapper>

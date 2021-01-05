@@ -1,0 +1,436 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.kyobo.mapper.maximo.bill.DetailMapper">
+	<sql id="search_query">
+		SELECT *
+		FROM (
+			SELECT AA.*
+				, CHARGE_TYPE_NM || '_' || TOWER_TYPE_NM AS TOWER_UNIQUE_ID
+				, CHARGE_TYPE_NM || '_' || TOWER_TYPE_NM || '_' || REPORT_CATEGORY_NM AS REPORT_UNIQUE_ID
+				, CHARGE_TYPE_NM || '_' || TOWER_TYPE_NM || '_' || REPORT_CATEGORY_NM || '_' || RESOURCE_CATEGORY_NM AS RESOURCE_UNIQUE_ID
+				, CONTRACT_TYPE_CD || '_' || CONTRACT_NO || '_' || SERVICE_APPLY_DATE || '_' || SERVICE_APPLY_SEQ || '_' || BASELINE_ID AS LINK_ID
+			FROM (
+				SELECT VARCHAR_FORMAT(DATE(TO_DATE(BILL_MONTH, 'YYYYMM')), 'YYYY/MM') AS BILL_MONTH_ORG
+					, VARCHAR_FORMAT(DATE(TO_DATE(BILL_MONTH, 'YYYYMM')), 'YYYY-MM-DD') || 'T00:00:00Z' AS BILL_MONTH
+					, A.CONTRACT_TYPE_CD
+					, FN_GET_CODE_NM('CONTRACT_TYPE', A.CONTRACT_TYPE_CD) AS CONTRACT_TYPE_NM
+					, A.CONTRACT_NO
+					, A.CHARGE_TYPE_CD
+					, FN_GET_CODE_NM('CHARGE_TYPE', A.CHARGE_TYPE_CD) AS CHARGE_TYPE_NM
+					, '' AS RESOURCE_TYPE_CD 
+					, '' AS RESOURCE_TYPE_NM
+					, A.BASELINE_ID AS TOWER_TYPE_CD 
+					, FN_GET_CODE_NM('TOWER_TYPE', A.BASELINE_ID) AS TOWER_TYPE_NM
+					, REPORT_CATEGORY_CD 
+					, FN_GET_CODE_NM('REPORT_CATEGORY', REPORT_CATEGORY_CD) AS REPORT_CATEGORY_NM
+					, '' AS RESOURCE_CATEGORY_CD 
+					, '' AS RESOURCE_CATEGORY_NM
+					, 0 AS RESOURCE_CATEGORY_SEQ
+					, A.BASELINE_ID
+					, CASE WHEN A.USAGE = 0 THEN '' ELSE VARCHAR_FORMAT(CAST(A.USAGE AS DEC(16,2)), '999,999,999,999.00') END AS USAGE
+					, CASE WHEN A.RATE = 0 THEN '' ELSE VARCHAR_FORMAT(CAST(A.RATE AS DEC(16,0)), '999,999,999,999') END AS RATE
+					, CASE WHEN A.APPLY_RATE = 0 THEN '' ELSE VARCHAR_FORMAT(CAST(A.APPLY_RATE AS DEC(16,0)), '999,999,999,999') END AS APPLY_RATE
+					, CASE WHEN A.SERVICE_DAYS = 0 THEN '' ELSE VARCHAR_FORMAT(CAST(A.SERVICE_DAYS AS INTEGER), '999,999,999,999') END AS SERVICE_DAYS
+					, CASE WHEN A.DAYS = 0 THEN '' ELSE VARCHAR_FORMAT(CAST(A.DAYS AS INTEGER), '999,999,999,999') END AS DAYS
+					, CASE WHEN A.AMOUNT = 0 THEN '' ELSE VARCHAR_FORMAT(CAST(A.AMOUNT AS DEC(16,0)), '999,999,999,999') END AS AMOUNT
+					, CASE WHEN A.USAGE_TPMC = 0 THEN '' ELSE VARCHAR_FORMAT(CAST(A.USAGE_TPMC AS DEC(16,2)), '999,999,999,999.00') END AS USAGE_TPMC
+					, A.SERVICE_APPLY_DATE
+					, A.SERVICE_APPLY_DATE || 'T00:00:00Z' AS SERVICE_ADD_DELETE_DATE
+					, A.SERVICE_APPLY_SEQ
+					, A.SERVICE_APPLY_SEQ AS SERVICE_ADD_DELETE_SEQ
+					, A.REMARK
+					, 0 AS ORDER_NO
+					, A.REG_USER_ID
+					, A.REG_USER_ID AS REG_USER_ID_NM
+					, VARCHAR_FORMAT(A.REG_DT, 'YYYY/MM/DD') AS REG_DT
+				FROM TB_BILL_DETAIL A
+				WHERE CHARGE_TYPE_CD = '001'
+			) AA
+			UNION ALL
+			SELECT AA.*
+				, CHARGE_TYPE_NM || '_' || TOWER_TYPE_NM AS TOWER_UNIQUE_ID
+				, CHARGE_TYPE_NM || '_' || TOWER_TYPE_NM || '_' || REPORT_CATEGORY_NM AS REPORT_UNIQUE_ID
+				, CHARGE_TYPE_NM || '_' || TOWER_TYPE_NM || '_' || REPORT_CATEGORY_NM || '_' || RESOURCE_CATEGORY_NM AS RESOURCE_UNIQUE_ID
+				, CONTRACT_TYPE_CD || '_' || CONTRACT_NO || '_' || SERVICE_APPLY_DATE || '_' || SERVICE_APPLY_SEQ || '_' || BASELINE_ID AS LINK_ID
+			FROM (
+				SELECT VARCHAR_FORMAT(DATE(TO_DATE(BILL_MONTH, 'YYYYMM')), 'YYYY/MM') AS BILL_MONTH_ORG
+					, VARCHAR_FORMAT(DATE(TO_DATE(BILL_MONTH, 'YYYYMM')), 'YYYY-MM-DD') || 'T00:00:00Z' AS BILL_MONTH
+					, A.CONTRACT_TYPE_CD
+					, FN_GET_CODE_NM('CONTRACT_TYPE', A.CONTRACT_TYPE_CD) AS CONTRACT_TYPE_NM
+					, A.CONTRACT_NO
+					, A.CHARGE_TYPE_CD
+					, FN_GET_CODE_NM('CHARGE_TYPE', A.CHARGE_TYPE_CD) AS CHARGE_TYPE_NM
+					, B.RESOURCE_TYPE_CD 
+					, FN_GET_CODE_NM('RESOURCE_TYPE', B.RESOURCE_TYPE_CD) AS RESOURCE_TYPE_NM
+					, B.TOWER_TYPE_CD 
+					, FN_GET_CODE_NM('TOWER_TYPE', B.TOWER_TYPE_CD) AS TOWER_TYPE_NM
+					, B.REPORT_CATEGORY_CD 
+					, FN_GET_CODE_NM('REPORT_CATEGORY', B.REPORT_CATEGORY_CD) AS REPORT_CATEGORY_NM
+					, B.RESOURCE_CATEGORY_CD 
+					, FN_GET_CODE_NM('RESOURCE_CATEGORY', B.RESOURCE_CATEGORY_CD) AS RESOURCE_CATEGORY_NM
+					, B.ORDER_NO AS RESOURCE_CATEGORY_SEQ 
+					, CASE WHEN A.CHARGE_TYPE_CD = '001' THEN B.TOWER_TYPE_CD ELSE B.BASELINE_ID END AS BASELINE_ID
+					, CASE WHEN A.USAGE = 0 THEN '' ELSE VARCHAR_FORMAT(CAST(A.USAGE AS DEC(16,2)), '999,999,999,999.00') END AS USAGE
+					, CASE WHEN A.RATE = 0 THEN '' ELSE VARCHAR_FORMAT(CAST(A.RATE AS DEC(16,0)), '999,999,999,999') END AS RATE
+					, CASE WHEN A.APPLY_RATE = 0 THEN '' ELSE VARCHAR_FORMAT(CAST(A.APPLY_RATE AS DEC(16,0)), '999,999,999,999') END AS APPLY_RATE
+					, CASE WHEN A.SERVICE_DAYS = 0 THEN '' ELSE VARCHAR_FORMAT(CAST(A.SERVICE_DAYS AS INTEGER), '999,999,999,999') END AS SERVICE_DAYS
+					, CASE WHEN A.DAYS = 0 THEN '' ELSE VARCHAR_FORMAT(CAST(A.DAYS AS INTEGER), '999,999,999,999') END AS DAYS
+					, CASE WHEN A.AMOUNT = 0 THEN '' ELSE VARCHAR_FORMAT(CAST(A.AMOUNT AS DEC(16,0)), '999,999,999,999') END AS AMOUNT
+					, CASE WHEN A.USAGE_TPMC = 0 THEN '' ELSE VARCHAR_FORMAT(CAST(A.USAGE_TPMC AS DEC(16,2)), '999,999,999,999.00') END AS USAGE_TPMC
+					, A.SERVICE_APPLY_DATE
+					, A.SERVICE_APPLY_DATE || 'T00:00:00Z' AS SERVICE_ADD_DELETE_DATE
+					, A.SERVICE_APPLY_SEQ
+					, A.SERVICE_APPLY_SEQ AS SERVICE_ADD_DELETE_SEQ
+					, A.REMARK
+					, B.ORDER_NO
+					, A.REG_USER_ID
+					, A.REG_USER_ID AS REG_USER_ID_NM
+					, VARCHAR_FORMAT(A.REG_DT, 'YYYY/MM/DD') AS REG_DT
+				FROM (
+					SELECT * 
+					FROM TB_BILL_DETAIL
+					WHERE CHARGE_TYPE_CD <![CDATA[<>]]> '001'
+				) A, TB_BILL_RESOURCE B
+				WHERE A.BASELINE_ID = B.BASELINE_ID
+			) AA
+		)
+	</sql>
+	<sql id="search_elk_query">
+		SELECT *
+		FROM (
+			SELECT AA.*
+				, CHARGE_TYPE_NM || '_' || TOWER_TYPE_NM AS TOWER_UNIQUE_ID
+				, CHARGE_TYPE_NM || '_' || TOWER_TYPE_NM || '_' || REPORT_CATEGORY_NM AS REPORT_UNIQUE_ID
+				, CHARGE_TYPE_NM || '_' || TOWER_TYPE_NM || '_' || REPORT_CATEGORY_NM || '_' || RESOURCE_CATEGORY_NM AS RESOURCE_UNIQUE_ID
+				, CONTRACT_TYPE_CD || '_' || CONTRACT_NO || '_' || SERVICE_APPLY_DATE || '_' || SERVICE_APPLY_SEQ || '_' || CHARGE_TYPE_NM AS LINK_ID
+			FROM (
+				SELECT VARCHAR_FORMAT(DATE(TO_DATE(BILL_MONTH, 'YYYYMM')), 'YYYY-MM') AS BILL_MONTH_ORG
+					, VARCHAR_FORMAT(DATE(TO_DATE(BILL_MONTH, 'YYYYMM')), 'YYYY-MM-DD') || 'T00:00:00Z' AS BILL_MONTH
+					, A.CONTRACT_TYPE_CD
+					, FN_GET_CODE_NM('CONTRACT_TYPE', A.CONTRACT_TYPE_CD) AS CONTRACT_TYPE_NM
+					, A.CONTRACT_NO
+					, FN_GET_CODE_NM('CHARGE_TYPE', A.CHARGE_TYPE_CD) AS CHARGE_TYPE_CD
+					, FN_GET_CODE_NM('CHARGE_TYPE', A.CHARGE_TYPE_CD) AS CHARGE_TYPE_NM
+					, '' AS RESOURCE_TYPE_CD 
+					, '' AS RESOURCE_TYPE_NM
+					, FN_GET_ELK_TOWER_TYPE_NM(A.BASELINE_ID) AS TOWER_TYPE_CD 
+					, FN_GET_ELK_TOWER_TYPE_NM(A.BASELINE_ID) AS TOWER_TYPE_NM
+					, REPORT_CATEGORY_CD 
+					, FN_GET_CODE_NM('REPORT_CATEGORY', REPORT_CATEGORY_CD) AS REPORT_CATEGORY_NM
+					, '' AS RESOURCE_CATEGORY_CD 
+					, '' AS RESOURCE_CATEGORY_NM
+					, 0 AS RESOURCE_CATEGORY_SEQ
+					, A.BASELINE_ID
+					, A.USAGE
+					, A.RATE
+					, A.APPLY_RATE
+					, A.SERVICE_DAYS
+					, A.DAYS
+					, CAST(A.AMOUNT AS INTEGER) AS AMOUNT
+					, A.USAGE_TPMC
+					, VARCHAR_FORMAT(DATE(TO_DATE(BILL_MONTH, 'YYYYMM')), 'YYYY-MM-DD') || 'T00:00:00Z' AS SERVICE_APPLY_DATE
+					, '#01' AS SERVICE_APPLY_SEQ
+					, A.REMARK
+					, 0 AS ORDER_NO
+					, FN_GET_CODE_NM('CHARGE_TYPE', A.CHARGE_TYPE_CD) || '_' || FN_GET_ELK_TOWER_TYPE_NM(BASELINE_ID) AS TOWER_UNIQUE_ID
+					, FN_GET_CODE_NM('CHARGE_TYPE', A.CHARGE_TYPE_CD) || '_' || FN_GET_ELK_TOWER_TYPE_NM(BASELINE_ID) || '_' || FN_GET_CODE_NM('REPORT_CATEGORY', REPORT_CATEGORY_CD) AS REPORT_UNIQUE_ID
+					, FN_GET_CODE_NM('CHARGE_TYPE', A.CHARGE_TYPE_CD) || '_' || FN_GET_ELK_TOWER_TYPE_NM(BASELINE_ID) || '_' || FN_GET_CODE_NM('REPORT_CATEGORY', REPORT_CATEGORY_CD) || '_' || '' AS RESOURCE_UNIQUE_ID
+					, A.CONTRACT_TYPE_CD || '_' || A.CONTRACT_NO || '_' || COALESCE(A.SERVICE_APPLY_DATE, '') || '_' || COALESCE(A.SERVICE_APPLY_SEQ, '') || '_' || FN_GET_ELK_TOWER_TYPE_NM(BASELINE_ID) AS LINK_ID
+					, A.REG_USER_ID
+					, A.REG_DT
+				FROM TB_BILL_DETAIL A
+				WHERE CHARGE_TYPE_CD = '001'
+			) AA
+			UNION ALL
+			SELECT AA.*
+				, CHARGE_TYPE_NM || '_' || TOWER_TYPE_NM AS TOWER_UNIQUE_ID
+				, CHARGE_TYPE_NM || '_' || TOWER_TYPE_NM || '_' || REPORT_CATEGORY_NM AS REPORT_UNIQUE_ID
+				, CHARGE_TYPE_NM || '_' || TOWER_TYPE_NM || '_' || REPORT_CATEGORY_NM || '_' || RESOURCE_CATEGORY_NM AS RESOURCE_UNIQUE_ID
+				, CONTRACT_TYPE_CD || '_' || CONTRACT_NO || '_' || SERVICE_APPLY_DATE || '_' || SERVICE_APPLY_SEQ || '_' || BASELINE_ID AS LINK_ID
+			FROM (
+				SELECT VARCHAR_FORMAT(DATE(TO_DATE(BILL_MONTH, 'YYYYMM')), 'YYYY-MM') AS BILL_MONTH_ORG
+					, VARCHAR_FORMAT(DATE(TO_DATE(BILL_MONTH, 'YYYYMM')), 'YYYY-MM-DD') || 'T00:00:00Z' AS BILL_MONTH
+					, A.CONTRACT_TYPE_CD
+					, FN_GET_CODE_NM('CONTRACT_TYPE', A.CONTRACT_TYPE_CD) AS CONTRACT_TYPE_NM
+					, A.CONTRACT_NO
+					, FN_GET_CODE_NM('CHARGE_TYPE', A.CHARGE_TYPE_CD) AS CHARGE_TYPE_CD
+					, FN_GET_CODE_NM('CHARGE_TYPE', A.CHARGE_TYPE_CD) AS CHARGE_TYPE_NM
+					, FN_GET_CODE_NM('RESOURCE_TYPE', B.RESOURCE_TYPE_CD) AS RESOURCE_TYPE_CD 
+					, FN_GET_CODE_NM('RESOURCE_TYPE', B.RESOURCE_TYPE_CD) AS RESOURCE_TYPE_NM
+					, FN_GET_ELK_TOWER_TYPE_NM(B.TOWER_TYPE_CD) AS TOWER_TYPE_CD 
+					, FN_GET_ELK_TOWER_TYPE_NM(B.TOWER_TYPE_CD) AS TOWER_TYPE_NM
+					, FN_GET_CODE_NM('REPORT_CATEGORY', B.REPORT_CATEGORY_CD) AS REPORT_CATEGORY_CD 
+					, FN_GET_CODE_NM('REPORT_CATEGORY', B.REPORT_CATEGORY_CD) AS REPORT_CATEGORY_NM
+					, FN_GET_CODE_NM('RESOURCE_CATEGORY', B.RESOURCE_CATEGORY_CD) AS RESOURCE_CATEGORY_CD 
+					, FN_GET_CODE_NM('RESOURCE_CATEGORY', B.RESOURCE_CATEGORY_CD) AS RESOURCE_CATEGORY_NM
+					, B.ORDER_NO AS RESOURCE_CATEGORY_SEQ 
+					, CASE WHEN A.CHARGE_TYPE_CD = '001' THEN B.TOWER_TYPE_CD ELSE B.BASELINE_ID END AS BASELINE_ID
+					, A.USAGE
+					, A.RATE
+					, A.APPLY_RATE
+					, A.SERVICE_DAYS
+					, A.DAYS
+					, CAST(A.AMOUNT AS INTEGER) AS AMOUNT
+					, A.USAGE_TPMC
+					, A.SERVICE_APPLY_DATE || 'T00:00:00Z' AS SERVICE_APPLY_DATE
+					, A.SERVICE_APPLY_SEQ
+					, A.REMARK
+					, B.ORDER_NO
+					, FN_GET_CODE_NM('CHARGE_TYPE', A.CHARGE_TYPE_CD) || '_' || FN_GET_ELK_TOWER_TYPE_NM(B.TOWER_TYPE_CD) AS TOWER_UNIQUE_ID
+					, FN_GET_CODE_NM('CHARGE_TYPE', A.CHARGE_TYPE_CD) || '_' || FN_GET_ELK_TOWER_TYPE_NM(B.TOWER_TYPE_CD) || '_' || FN_GET_CODE_NM('REPORT_CATEGORY', B.REPORT_CATEGORY_CD) AS REPORT_UNIQUE_ID
+					, FN_GET_CODE_NM('CHARGE_TYPE', A.CHARGE_TYPE_CD) || '_' || FN_GET_ELK_TOWER_TYPE_NM(B.TOWER_TYPE_CD) || '_' || FN_GET_CODE_NM('REPORT_CATEGORY', B.REPORT_CATEGORY_CD) || '_' || FN_GET_CODE_NM('RESOURCE_CATEGORY', B.RESOURCE_CATEGORY_CD) AS RESOURCE_UNIQUE_ID
+					, A.CONTRACT_TYPE_CD || '_' || A.CONTRACT_NO || '_' || A.SERVICE_APPLY_DATE || '_' || A.SERVICE_APPLY_SEQ || '_' || B.BASELINE_ID AS LINK_ID
+					, A.REG_USER_ID
+					, A.REG_DT
+				FROM (
+					SELECT * 
+					FROM TB_BILL_DETAIL
+					WHERE CHARGE_TYPE_CD <![CDATA[<>]]> '001'
+				) A, TB_BILL_RESOURCE B
+				WHERE A.BASELINE_ID = B.BASELINE_ID
+			) AA
+		)
+	</sql>
+	<sql id="search_conditions">
+		<where>
+			<if test="BILL_MONTH != null and BILL_MONTH != ''">
+				AND REPLACE(BILL_MONTH_ORG, '/', '') = REPLACE(#{BILL_MONTH}, '/', '')
+			</if>
+			<if test="CONTRACT_TYPE_CD != null and CONTRACT_TYPE_CD != ''">
+				AND CONTRACT_TYPE_CD = #{CONTRACT_TYPE_CD}
+			</if>
+			<if test="CONTRACT_NO != null and CONTRACT_NO != ''">
+				AND CONTRACT_NO LIKE '%' || UPPER(#{CONTRACT_NO}) || '%'
+			</if>
+			<if test="CHARGE_TYPE_CD != null and CHARGE_TYPE_CD != ''">
+				AND CHARGE_TYPE_CD = #{CHARGE_TYPE_CD}
+			</if>
+			<if test="RESOURCE_TYPE_CD != null and RESOURCE_TYPE_CD != ''">
+				AND RESOURCE_TYPE_CD = #{RESOURCE_TYPE_CD}
+			</if>
+			<if test="TOWER_TYPE_CD != null and TOWER_TYPE_CD != ''">
+				AND TOWER_TYPE_CD = #{TOWER_TYPE_CD}
+			</if>
+			<if test="BASELINE_ID != null and BASELINE_ID != ''">
+				AND BASELINE_ID = #{BASELINE_ID}
+			</if>
+			<if test="REMARK != null and REMARK != ''">
+				AND REMARK LIKE '%' || UPPER(#{REMARK}) || '%'
+			</if>
+		</where>
+	</sql>
+	<sql id="search_elk_conditions">
+		<where>
+			<if test="BILL_MONTH != null and BILL_MONTH != ''">
+				AND REPLACE(BILL_MONTH_ORG, '-', '') = REPLACE(#{BILL_MONTH}, '/', '')
+			</if>
+			<if test="CONTRACT_TYPE_CD != null and CONTRACT_TYPE_CD != ''">
+				AND CONTRACT_TYPE_CD = #{CONTRACT_TYPE_CD}
+			</if>
+			<if test="CONTRACT_NO != null and CONTRACT_NO != ''">
+				AND CONTRACT_NO LIKE '%' || UPPER(#{CONTRACT_NO}) || '%'
+			</if>
+			<if test="CHARGE_TYPE_CD != null and CHARGE_TYPE_CD != ''">
+				AND CHARGE_TYPE_CD = #{CHARGE_TYPE_CD}
+			</if>
+			<if test="RESOURCE_TYPE_CD != null and RESOURCE_TYPE_CD != ''">
+				AND RESOURCE_TYPE_CD = #{RESOURCE_TYPE_CD}
+			</if>
+			<if test="TOWER_TYPE_CD != null and TOWER_TYPE_CD != ''">
+				AND TOWER_TYPE_CD = #{TOWER_TYPE_CD}
+			</if>
+			<if test="BASELINE_ID != null and BASELINE_ID != ''">
+				AND BASELINE_ID = #{BASELINE_ID}
+			</if>
+			<if test="REMARK != null and REMARK != ''">
+				AND REMARK LIKE '%' || UPPER(#{REMARK}) || '%'
+			</if>
+		</where>
+	</sql>
+	<select id="findAllJson" parameterType="HashMap" resultType="HashMap">
+		SELECT *
+		FROM (
+			<include refid="search_elk_query"></include>
+			<include refid="search_elk_conditions"></include>
+		) A
+	</select>
+	
+	<select id="findAll" parameterType="HashMap" resultType="HashMap">
+		SELECT *
+		FROM (
+			<include refid="search_query"></include>
+			<include refid="search_conditions"></include>
+			<if test="length!=null and !length.equals('')">
+				LIMIT ${length}
+				OFFSET ${start}
+			</if>
+		) A
+	</select>
+	
+	<select id="findCount" parameterType="HashMap" resultType="int">
+		SELECT count(*)
+		FROM (
+			<include refid="search_query"></include>
+			<include refid="search_conditions"></include>
+		) A
+	</select>
+	
+	<select id="findOne" parameterType="HashMap" resultType="HashMap">
+		SELECT *
+		FROM (
+			<include refid="search_query"></include>
+			<include refid="search_conditions"></include>
+		) A
+	</select>
+	
+	<insert id="insert" parameterType="HashMap">
+		INSERT INTO TB_BILL_DETAIL (
+			TB_BILL_DETAILID
+			, BILL_MONTH
+			, CONTRACT_TYPE_CD
+			, CONTRACT_NO
+			, CHARGE_TYPE_CD
+			, BASELINE_ID
+			, USAGE
+			, RATE
+			, APPLY_RATE
+			, SERVICE_DAYS
+			, DAYS
+			, AMOUNT
+			, USAGE_TPMC
+			, SERVICE_APPLY_DATE
+			, SERVICE_APPLY_SEQ
+			, REMARK
+			, REPORT_CATEGORY_CD
+			, REG_USER_ID
+			, REG_DT
+		) VALUES
+		<foreach collection="dataList" item="data" separator=",">
+			(
+				NEXTVAL FOR TB_BILL_DETAILIDSEQ
+				, REPLACE(#{BILL_MONTH}, '/', '')
+				, #{data.CONTRACT_TYPE_CD}
+				, #{data.CONTRACT_NO}
+				, #{data.CHARGE_TYPE_CD}
+				, #{data.BASELINE_ID}
+				<choose>
+					<when test="data.USAGE != null and data.USAGE != ''">
+						, CAST(#{data.USAGE} AS DECIMAL(16, 3))
+					</when>
+					<otherwise>
+						, 0
+					</otherwise>
+				</choose>
+				<choose>
+					<when test="data.RATE != null and data.RATE != ''">
+						, CAST(#{data.RATE} AS INTEGER)
+					</when>
+					<otherwise>
+						, 0
+					</otherwise>
+				</choose>
+				<choose>
+					<when test="data.APPLY_RATE != null and data.APPLY_RATE != ''">
+						, CAST(#{data.APPLY_RATE} AS INTEGER)
+					</when>
+					<otherwise>
+						, 0
+					</otherwise>
+				</choose>
+				<choose>
+					<when test="data.SERVICE_DAYS != null and data.SERVICE_DAYS != ''">
+						, CAST(#{data.SERVICE_DAYS} AS INTEGER)
+					</when>
+					<otherwise>
+						, 0
+					</otherwise>
+				</choose>
+				<choose>
+					<when test="data.DAYS != null and data.DAYS != ''">
+						, CAST(#{data.DAYS} AS INTEGER)
+					</when>
+					<otherwise>
+						, 0
+					</otherwise>
+				</choose>
+				<choose>
+					<when test="data.AMOUNT != null and data.AMOUNT != ''">
+						, CAST(#{data.AMOUNT} AS DECIMAL(16, 3))
+					</when>
+					<otherwise>
+						, 0
+					</otherwise>
+				</choose>
+				<choose>
+					<when test="data.USAGE_TPMC != null and data.USAGE_TPMC != ''">
+						, CAST(#{data.USAGE_TPMC} AS DECIMAL(16, 3))
+					</when>
+					<otherwise>
+						, 0
+					</otherwise>
+				</choose>
+				, #{data.SERVICE_APPLY_DATE}
+				, #{data.SERVICE_APPLY_SEQ}
+				, #{data.REMARK}
+				, #{data.REPORT_CATEGORY_CD}
+				, #{data.REG_USER_ID}
+				, CURRENT TIMESTAMP
+			)
+		</foreach>
+	</insert>
+	
+	<insert id="insertHist" parameterType="HashMap">
+		INSERT INTO TB_BILL_DETAIL_HIST (
+			TB_BILL_DETAIL_HISTID
+			, HIST_SEQ
+			, BILL_MONTH
+			, CONTRACT_TYPE_CD
+			, CONTRACT_NO
+			, CHARGE_TYPE_CD
+			, BASELINE_ID
+			, USAGE
+			, RATE
+			, APPLY_RATE
+			, SERVICE_DAYS
+			, DAYS
+			, AMOUNT
+			, SERVICE_APPLY_DATE
+			, SERVICE_APPLY_SEQ
+			, REMARK
+			, REPORT_CATEGORY_CD
+			, REG_USER_ID
+			, REG_DT
+		)
+		SELECT NEXTVAL FOR TB_BILL_DETAIL_HISTIDSEQ
+			, (
+				SELECT COALESCE(MAX(HIST_SEQ), 0) + 1
+				FROM TB_BILL_DETAIL_HIST
+				WHERE BILL_MONTH = REPLACE(#{BILL_MONTH}, '/', '')
+			)
+			, BILL_MONTH
+			, CONTRACT_TYPE_CD
+			, CONTRACT_NO
+			, CHARGE_TYPE_CD
+			, BASELINE_ID
+			, USAGE
+			, RATE
+			, APPLY_RATE
+			, SERVICE_DAYS
+			, DAYS
+			, AMOUNT
+			, SERVICE_APPLY_DATE
+			, SERVICE_APPLY_SEQ
+			, REMARK
+			, REPORT_CATEGORY_CD
+			, #{REG_USER_ID}
+			, CURRENT TIMESTAMP
+		FROM TB_BILL_DETAIL
+		WHERE BILL_MONTH = REPLACE(#{BILL_MONTH}, '/', '')
+	</insert>
+	
+	<delete id="delete" parameterType="HashMap">
+		DELETE FROM TB_BILL_DETAIL
+		WHERE BILL_MONTH = REPLACE(#{BILL_MONTH}, '/', '')
+	</delete>
+</mapper>

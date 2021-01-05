@@ -1,0 +1,347 @@
+@charset "UTF-8";
+/*
+	.Final Editor : LEY
+	.Description : IoT Service Portal CSS
+	.Last Edit : 2020.08.28
+*/
+
+/*************************** FONTS CSS  ***************************/
+/* noto-sans-kr-regular - latin */
+@font-face {
+    font-family: 'Noto Sans KR';
+    font-style: normal;
+    font-weight: 400;
+    src: url('../fonts/noto-sans-kr-v12-latin-regular.eot');
+    src: local('Noto Sans KR Regular'), local('NotoSansKR-Regular'),
+        url('../fonts/noto-sans-kr-v12-latin-regular.eot?#iefix') format('embedded-opentype'),
+        url('../fonts/noto-sans-kr-v12-latin-regular.woff2') format('woff2'),
+        url('../fonts/noto-sans-kr-v12-latin-regular.woff') format('woff'),
+        url('../fonts/noto-sans-kr-v12-latin-regular.ttf') format('truetype'),
+        url('../fonts/noto-sans-kr-v12-latin-regular.svg#NotoSansKR') format('svg');
+}
+@font-face {
+    font-family: 'Noto Sans KR';
+    font-style: normal;
+    font-weight: 400;
+    src: url('../fonts/open-sans-v17-latin-regular.eot');
+    src: local('Open Sans Regular'), local('OpenSans-Regular'),
+        url('../fonts/open-sans-v17-latin-regular.eot?#iefix') format('embedded-opentype'),
+        url('../fonts/open-sans-v17-latin-regular.woff2') format('woff2'),
+        url('../fonts/open-sans-v17-latin-regular.woff') format('woff'),
+        url('../fonts/open-sans-v17-latin-regular.ttf') format('truetype'),
+        url('../fonts/open-sans-v17-latin-regular.svg#OpenSans') format('svg');
+    unicode-range: U+0020-007E;
+}
+/* noto-sans-kr-500 - latin */
+@font-face {
+    font-family: 'Noto Sans KR';
+    font-style: normal;
+    font-weight: 500;
+    src: url('../fonts/noto-sans-kr-v12-latin-500.eot');
+    src: local('Noto Sans KR Medium'), local('NotoSansKR-Medium'),
+        url('../fonts/noto-sans-kr-v12-latin-500.eot?#iefix') format('embedded-opentype'),
+        url('../fonts/noto-sans-kr-v12-latin-500.woff2') format('woff2'),
+        url('../fonts/noto-sans-kr-v12-latin-500.woff') format('woff'),
+        url('../fonts/noto-sans-kr-v12-latin-500.ttf') format('truetype'),
+        url('../fonts/noto-sans-kr-v12-latin-500.svg#NotoSansKR') format('svg');
+}
+@font-face {
+    font-family: 'Noto Sans KR';
+    font-style: normal;
+    font-weight: 600;
+    src: url('../fonts/open-sans-v17-latin-600.eot');
+    src: local('Open Sans SemiBold'), local('OpenSans-SemiBold'),
+        url('../fonts/open-sans-v17-latin-600.eot?#iefix') format('embedded-opentype'),
+        url('../fonts/open-sans-v17-latin-600.woff2') format('woff2'),
+        url('../fonts/open-sans-v17-latin-600.woff') format('woff'),
+        url('../fonts/open-sans-v17-latin-600.ttf') format('truetype'),
+        url('../fonts/open-sans-v17-latin-600.svg#OpenSans') format('svg');
+    unicode-range: U+0020-007E;
+}
+/* noto-sans-kr-700 - latin */
+@font-face {
+    font-family: 'Noto Sans KR';
+    font-style: normal;
+    font-weight: 700;
+    src: url('../fonts/noto-sans-kr-v12-latin-700.eot');
+    src: local('Noto Sans KR Bold'), local('NotoSansKR-Bold'),
+        url('../fonts/noto-sans-kr-v12-latin-700.eot?#iefix') format('embedded-opentype'),
+        url('../fonts/noto-sans-kr-v12-latin-700.woff2') format('woff2'),
+        url('../fonts/noto-sans-kr-v12-latin-700.woff') format('woff'),
+        url('../fonts/noto-sans-kr-v12-latin-700.ttf') format('truetype'),
+        url('../fonts/noto-sans-kr-v12-latin-700.svg#NotoSansKR') format('svg');
+}
+/* noto-sans-kr-700 - latin */
+@font-face {
+    font-family: 'Noto Sans KR';
+    font-style: normal;
+    font-weight: 700;
+    src: url('../fonts/open-sans-v17-latin-700.eot');
+    src: local('Open Sans Bold'), local('OpenSans-Bold'),
+        url('../fonts/open-sans-v17-latin-700.eot?#iefix') format('embedded-opentype'),
+        url('../fonts/open-sans-v17-latin-700.woff2') format('woff2'),
+        url('../fonts/open-sans-v17-latin-700.woff') format('woff'),
+        url('../fonts/open-sans-v17-latin-700.ttf') format('truetype'),
+        url('../fonts/open-sans-v17-latin-700.svg#OpenSans') format('svg');
+    unicode-range: U+0020-007E;
+}
+/*************************** Common CSS  ***************************/
+body,html{width:100%;height:100%;margin:0;padding:0;font-family:'Noto Sans KR', 'sans-serif';letter-spacing:-0.5px;font-size:14px;line-height:1.5;color:#626366;-webkit-print-color-adjust:exact;background-color:#ffffff;overflow:hidden;}
+*{-webkit-text-size-adjust:none;-webkit-box-sizing:border-box;-moz-box-sizing:border-box;box-sizing:border-box;}
+body,div,img,h1,h2,h3,h4,h5,h6,ul,li,p,ol,dl,dt,dd,span{margin:0;padding:0;border:0;vertical-align:baseline;background:no-scroll transparent;direction:ltr;}
+ul,ol,li{list-style-type:none;}
+h1,h2,h3,h4,h5,h6,p{font-family:'Noto Sans KR', sans-serif;letter-spacing:-0.5px;line-height:1.2;}
+.mlf25{margin-left:25px !important;}
+.mt10{margin-top:10px !important;}
+.plf35{padding-left:35px !important;}
+.prt35{padding-right:35px !important;}
+.pt32{padding-top:32px !important;}
+.pbt32{padding-bottom:32px !important;}
+.pbt0{padding-bottom:0px !important;}
+.fw500{font-weight:500 !important;}
+.fw600{font-weight:600 !important;}
+.fw700{font-weight:700 !important;}
+/* *************************** Hover Event CSS *************************** */
+/* *** Icon Grow *** */
+.hvr-icon-grow {
+    display: inline-block;
+    vertical-align: middle;
+    -webkit-transform: perspective(1px) translateZ(0);
+    transform: perspective(1px) translateZ(0);
+    box-shadow: 0 0 1px rgba(0, 0, 0, 0);
+    -webkit-transition-duration: 0s;
+    transition-duration: 0s;
+}
+.hvr-icon-grow .hvr-icon {
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+    -webkit-transition-duration: 0s;
+    transition-duration: 0s;
+    -webkit-transition-property: transform;
+    transition-property: transform;
+    -webkit-transition-timing-function: ease-out;
+    transition-timing-function: ease-out;
+}
+.hvr-icon-grow:hover .hvr-icon,
+.hvr-icon-grow:focus .hvr-icon,
+.hvr-icon-grow:active .hvr-icon {
+    -webkit-transform: scale(1.1) translateZ(0);
+    transform: scale(1.1) translateZ(0);
+}
+/* ************************ IoT Service Potal css ************************ */
+/* *** header *** */
+.headerWrap {
+    width: 100%;
+    max-width: 100%;
+    height: 65px;
+    background-color: #002A5E;
+    position: relative;
+    z-index: 100;
+}
+.headerWrap .container {
+    max-width: 100%;
+    height: 100%;
+    margin: 0 auto;
+    position: relative;
+}
+.headerWrap .container .Ulrow {
+    text-align: center;
+    clear: both;
+}
+.headerWrap .container .Ulrow .Licolumn {
+    float: left;
+    width: 100%;
+    height: 65px !important;
+    min-height: 65px;
+    line-height: 65px;
+}
+.headerWrap .container .Ulrow .Licolumn.left {
+    text-align: left;
+    display: inline-block;
+    vertical-align: middle;
+    display: -ms-flexbox;
+    display: flex;
+    -ms-flex-align: center;
+    align-items: center;
+    width: 80%;
+}
+.headerWrap .container .Ulrow .Licolumn.right {
+    text-align: right;
+    display: inline-block;
+    width: 20%;
+}
+.Licolumn .HeaderH1 {
+    color: #ffffff;
+    font-weight: 600;
+    font-size: 1.786rem !important;
+}
+.headerWrap .container .Ulrow .Licolumn .img {
+    vertical-align: middle;
+    display: inline;
+}
+/* *** section *** */
+.section {
+    width: 100%;
+    height: 100%;
+}
+.section .sectionWrap {
+    max-width: 100%;
+    height: calc(100% - 65px);
+    margin: 0 auto;
+    background-color: gray;
+}
+.section .sectionWrap .colContainer {
+    display: -ms-flexbox;
+    display: flex;
+    width: 100%;
+    -ms-flex-wrap: wrap;
+    flex-wrap: wrap;
+    height: 100%;
+    min-width: 400px;
+}
+.section .sectionWrap .colContainer .col {
+    flex: 1;
+}
+.section .sectionWrap .colContainer .col .colcenter {
+    display: -ms-flexbox;
+    display: flex;
+    -ms-flex-pack: center;
+    justify-content: center;
+    -ms-flex-align: center;
+    align-items: center;
+    height: 100%;
+    max-height: 100% !important;
+}
+.colContainer .col .colcenter .colInContainer {
+    display: -ms-flexbox;
+    display: flex;
+    width: 100%;
+    -ms-flex-wrap: wrap;
+    flex-wrap: wrap;
+    -ms-flex-direction: column;
+    flex-direction: column;
+}
+.colContainer .col .colcenter .colInContainer .colIn {
+    flex: 1 1 auto;
+    padding: 16px;
+}
+.colContainer .col .colcenter .colInContainer .colIn .txt1 {
+    display: -ms-flexbox;
+    display: flex;
+    -ms-flex-pack: center;
+    justify-content: center;
+    -ms-flex-align: center;
+    align-items: center;
+    height: 45px;
+    flex-direction: column;
+}
+.colContainer .col .colcenter .colInContainer .colIn .inCenter {
+    display: -ms-flexbox;
+    display: flex;
+    -ms-flex-pack: center;
+    justify-content: center;
+    -ms-flex-align: center;
+    align-items: center;
+    height: 100%;
+}
+.colcenter .colInContainer .colIn .inCenter .colBox {
+    width: 100%;
+    height: 100% !important;
+    max-width: 380px;
+    min-height: 320px;
+    background-color: #ffffff;
+    border: 1px solid #4164D8;
+    border-bottom: 15px solid #4164D8;
+    border-radius: 10px;
+    -webkit-border-radius: 10px;
+    -moz-border-radius: 10px;
+    -o-border-radius: 10px;
+    display: -ms-flexbox;
+    display: flex;
+    -ms-flex-pack: center;
+    justify-content: center;
+    -ms-flex-align: center;
+    align-items: center;
+    color: #000000;
+    text-align: center;
+}
+.colIn .inCenter .colBox .colBoxHt {
+    min-height: 320px;
+    height: 320px;
+    display: -ms-flexbox;
+    display: flex;
+    -ms-flex-align: center;
+    align-items: center;
+    -ms-flex-pack: center;
+    justify-content: center;
+    flex-direction: column;
+}
+.colcenter .colInContainer .colIn .inCenter .colBox:hover {
+    background-color: #4164D8;
+    -webkit-transition-duration: 0.3s;
+    transition-duration: 0.3s;
+    color: #ffffff;
+}
+.colcenter .colInContainer .colIn .inCenter .colBox img {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+.colcenter .colInContainer .colIn .SectionH2 {
+    font-size: 28px !important;
+    color: #003473;
+}
+.colcenter .colInContainer .colIn .inCenter .colBox .sectionP {
+    padding-top: 30px;
+    font-size: 25px !important;
+}
+@media all and (min-width:750px) and (max-width:1250px) {
+    .section .sectionWrap .colContainer {
+        overflow-y: scroll !important;
+        max-height: 100%;
+    }
+    .section .sectionWrap .colContainer .col {
+        flex: 50%;
+    }
+    .colBox {
+        width: 100%;
+        height: 100% !important;
+        max-width: 380px;
+        min-height: 320px;
+    }
+    .colContainer .col .colcenter .colInContainer .colIn:last-child {
+        padding-bottom: 32px;
+    }
+}
+@media screen and (max-width: 750px) {
+    .headerWrap .container .Ulrow .Licolumn.left {
+        width: 70%;
+    }
+    .headerWrap .container .Ulrow .Licolumn.right {
+        width: 30%;
+    }
+    .Licolumn .HeaderH1 {
+        margin-left: 15px !important;
+    }
+    .section .sectionWrap .colContainer {
+        overflow-y: scroll !important;
+        max-height: 100%;
+    }
+    .section .sectionWrap .colContainer .col {
+        flex: 100%;
+    }
+}
+@media screen and (max-width: 460px) {
+    .headerWrap .container  .Ulrow .Licolumn.left {
+        width: 50%;
+        padding-left: 16px !important;
+    }
+    .headerWrap .container .Ulrow .Licolumn.right {
+        width: 50%;
+        padding-right: 16px !important;
+        padding-left:32px !important;
+    }
+    .Licolumn .HeaderH1 {
+        display: none;
+    }
+}

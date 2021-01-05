@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html layout:decorator="thymeleaf/layout/layout_blank">
+<head>
+	<title layout:title-pattern="$LAYOUT_TITLE : $CONTENT_TITLE">[(#{title.info})]</title>
+</head>
+<body>
+	<div layout:fragment="content">
+		<div class="error-page">
+			<div class="error-content">
+				<h3><i class="fas fa-exclamation-triangle text-warning"></i> [(#{msg.error.403})]</h3>
+			</div>
+		</div>
+	</div>
+</body>
+</html>

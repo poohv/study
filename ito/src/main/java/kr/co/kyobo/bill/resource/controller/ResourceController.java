@@ -1,0 +1,229 @@
+package kr.co.kyobo.bill.resource.controller;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import kr.co.kyobo.bill.resource.service.ResourceService;
+import kr.co.kyobo.common.service.CommonCodeService;
+import kr.co.kyobo.common.service.SftpService;
+import lombok.extern.slf4j.Slf4j;
+
+/**
+ * 과금 리소스관리 컨트롤러
+ * <pre>
+ * <b>이력:</b>
+ * 		2020. 7. 14. 최초작성 - 최지웅
+ * </pre>
+ *
+ * @author 최지웅
+ * @version 1.0 최초작성
+ */
+@Controller
+@Slf4j
+public class ResourceController {
+
+	@Autowired
+	private ResourceService resourceService;
+	
+	@Autowired
+	private SftpService sftpService;
+	
+	@Autowired
+	private MessageSource messageSource;
+	
+	@Autowired
+	private CommonCodeService commonCodeService;
+	
+	/**
+	 * 인덱스 화면 호출
+	 * @param model
+	 * @return
+	 */
+	@RequestMapping("/bill/resource/index")
+	public String indexPage(Model model) {
+		return "thymeleaf/bill/resource/index";
+	}
+	
+	/**
+	 * 목록 화면 호출
+	 * @param model
+	 * @return
+	 */
+	@RequestMapping("/bill/resource/list")
+	public String listPage(Model model) {
+		return "thymeleaf/bill/resource/list";
+	}
+	
+	/**
+	 * 등록화면 호출
+	 * @param model
+	 * @return
+	 */
+	@RequestMapping("/bill/resource/regist")
+	public String registPage(Model model) {
+		return "thymeleaf/bill/resource/regist";
+	}
+	
+	/**
+	 * 수정화면 호출
+	 * @param model
+	 * @return
+	 */
+	@RequestMapping("/bill/resource/update")
+	public String updatePage(@RequestParam Map<String, Object> params, Model model) {
+		
+		//String baselineId = params.get(arg0)
+		params.put("BASELINE_ID", params.get("BASELINE_ID"));
+		
+		Map<String, Object> conditions1 = new HashMap<String, Object>();
+		conditions1.put("DOMAINID", "RESOURCE_TYPE");
+		model.addAttribute("resourceTypeCdList", commonCodeService.findCodeList(conditions1));
+		
+		Map<String, Object> conditions2 = new HashMap<String, Object>();
+		conditions2.put("DOMAINID", "TOWER_TYPE");
+		model.addAttribute("towerTypeCdList", commonCodeService.findCodeList(conditions2));
+		
+		Map<String, Object> conditions3 = new HashMap<String, Object>();
+		conditions3.put("DOMAINID", "REPORT_CATEGORY");
+		model.addAttribute("reportCategoryCdList", commonCodeService.findCodeList(conditions3));
+		
+		Map<String, Object> conditions4 = new HashMap<String, Object>();
+		conditions4.put("DOMAINID", "RESOURCE_CATEGORY");
+		model.addAttribute("resourceCategoryCdList", commonCodeService.findCodeList(conditions4));
+		
+		model.addAllAttributes(params);
+		
+		return "thymeleaf/bill/resource/update";
+	}
+	
+	@ResponseBody
+	@RequestMapping("/bill/resource/dataList")
+	public Map<String, Object> findDataList(@RequestParam Map<String, Object> params) {
+		Map<String, Object> resultMap = new HashMap<String, Object>();
+		
+		if(!"-1".equals(params.get("length"))){
+			int totalCnt = resourceService.findCount(params);
+			List<Map<String, Object>> dataList = resourceService.findAll(params);
+				
+			resultMap.put("recordsTotal", totalCnt);
+			resultMap.put("recordsFiltered", totalCnt);
+			resultMap.put("data", dataList);
+		}else {
+			List<Map<String, Object>> dataList = resourceService.findAll(params);
+			resultMap.put("recordsTotal", dataList.size());
+			resultMap.put("recordsFiltered", dataList.size());
+			resultMap.put("data", dataList);
+		}
+		
+//		int totalCnt = resourceService.findCount(params);
+//		List<Map<String, Object>> dataList = resourceService.findAll(params);
+//		
+//		resultMap.put("recordsTotal", dataList.size());
+//		resultMap.put("recordsFiltered", dataList.size());
+//		resultMap.put("data", dataList);
+		
+//		ObjectMapper objectMapper = new ObjectMapper();
+//		objectMapper.configure(SerializationFeature.INDENT_OUTPUT, true);
+//		objectMapper.writeValue(new File("C:/dev/data/test.json"), resultMap);
+		
+		//JSch로 원격업로드
+//		sftpService.init();
+		
+		return resultMap;
+	}
+	
+	@ResponseBody
+	@RequestMapping("/bill/resource/findData")
+	public Map<String, Object> findData(@RequestBody Map<String, Object> params) {
+		return resourceService.findOne(params);
+	}
+	
+	@ResponseBody
+	@RequestMapping("/bill/resource/registData")
+	public Map<String, Object> regist(@RequestBody Map<String, Object> params
+//			, MultipartHttpServletRequest fileList
+			) {
+		Map<String, Object> resultMap = new HashMap<String, Object>();
+		resultMap.put("result", messageSource.getMessage("msg.result.success", null, null));
+		resultMap.put("resultMsg", messageSource.getMessage("msg.regist.success", null, null));
+		
+		
+		int resultCnt = resourceService.findCount(params);
+		
+		if(resultCnt > 0) {
+			resultMap.put("result", messageSource.getMessage("msg.result.fail", null, null));
+			resultMap.put("resultMsg", messageSource.getMessage("msg.exist.data", null, null));
+		} else {
+			resultCnt = resourceService.insert(params);
+			
+			if(resultCnt == 0) {
+				resultMap.put("result", messageSource.getMessage("msg.result.fail", null, null));
+				resultMap.put("resultMsg", messageSource.getMessage("msg.regist.fail", null, null));
+			}
+		}
+		
+		return resultMap;
+	}
+	
+	@ResponseBody
+	@RequestMapping("/bill/resource/updateData")
+	public Map<String, Object> update(@RequestParam Map<String, Object> params
+			, Authentication authentication
+//			, MultipartHttpServletRequest fileList
+			) {
+		Map<String, Object> resultMap = new HashMap<String, Object>();
+		resultMap.put("result", messageSource.getMessage("msg.result.success", null, null));
+		resultMap.put("resultMsg", messageSource.getMessage("msg.update.success", null, null));
+		
+		UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+		params.put("UPD_USER_ID", userDetails.getUsername());
+		
+		int resultCnt = resourceService.update(params);
+		
+		if(resultCnt == 0) {
+			resultMap.put("result", messageSource.getMessage("msg.result.fail", null, null));
+			resultMap.put("resultMsg", messageSource.getMessage("msg.update.fail", null, null));
+		}
+		
+		return resultMap;
+	}
+	
+	@ResponseBody
+	@RequestMapping("/bill/resource/updateOrderNo")
+	public Map<String, Object> updateOrderNo(@RequestBody String[] baseLineList
+			, Authentication authentication
+//			, MultipartHttpServletRequest fileList
+			) {
+		Map<String, Object> resultMap = new HashMap<String, Object>();
+		resultMap.put("result", messageSource.getMessage("msg.result.success", null, null));
+		resultMap.put("resultMsg", messageSource.getMessage("msg.update.success", null, null));
+		
+		Map<String, Object> params = new HashMap<String, Object>();
+		UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+		params.put("UPD_USER_ID", userDetails.getUsername());
+		for (int i = 0; i < baseLineList.length; i++) {
+			params.put("BASELINE_ID", baseLineList[i]);
+			params.put("ORDER_NO", i);
+			int resultCnt = resourceService.updateOrderNo(params);
+			
+			if(resultCnt == 0) {
+				resultMap.put("result", messageSource.getMessage("msg.result.fail", null, null));
+				resultMap.put("resultMsg", messageSource.getMessage("msg.update.fail", null, null));
+			}
+		}
+		
+		return resultMap;
+	}
+}

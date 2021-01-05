@@ -1,0 +1,131 @@
+<%-- <%@page import="com.initech.eam.api.NXNLSAPI"%>
+<%@page import="com.initech.eam.smartenforcer.SECode"%>
+<%@page import="java.util.Vector"%>
+<%@page import="com.initech.eam.nls.CookieManager"%>
+<%@page import="java.util.ArrayList"%>
+<%@page import="java.util.List"%>
+<%@page import="org.apache.log4j.PropertyConfigurator"%>
+<%@page import="com.initech.eam.api.NXContext"%>
+<%!
+/**[INISAFE NEXESS JAVA AGENT]**********************************************************************
+* 업무시스템 설정 사항 (업무 환경에 맞게 변경)
+***************************************************************************************************/
+
+/***[SERVICE CONFIGURATION]***********************************************************************/
+	private String SERVICE_NAME = "ITO";                         // 예) SSO
+	private String SERVER_URL 	= "http://tito.kyobo.com:8080";                // 예) http://issodev.kyobo.com:6080
+	private String ASCP_URL = SERVER_URL + "/ito/sso/login"; // SSO 인증토큰 검증 페이지
+
+	//Custom Login Url
+	//private String custom_url = SERVER_URL + "/jsp/user/login";
+	private String custom_url = "";
+/*************************************************************************************************/
+
+/***[SSO CONFIGURATION]]*************************************************************************/
+	//private String NLS_URL 		 = "http://issodev.kyobo.com:6080";  // SSO 통합로그인 접속 URL
+	private String NLS_URL 		 = "http://sso.kyobo.com:5070"; 
+	//private String NLS_LOGIN_URL = NLS_URL + "/nls3/cookieLogin.jsp";
+	private String NLS_LOGIN_URL = NLS_URL + "/nls3/clientLogin.jsp";
+	private String NLS_LOGOUT_URL= NLS_URL + "/nls3/NCLogout.jsp";
+	private String NLS_ERROR_URL = NLS_URL + "/nls3/error.jsp";
+	//private static String ND_URL1 = "http://issodev.kyobo.com:6080/rpc2/";  // SSO 데몬 접속 URL
+	//private static String ND_URL2 = "http://issodev.kyobo.com:6080/rpc2/";  // SSO 데몬 접속 URL
+	private static String ND_URL1 = "http://sso.kyobo.com:5070/rpc2/";  // SSO µ¥¸ó Á¢¼Ó URL
+	private static String ND_URL2 = "http://sso.kyobo.com:5070/rpc2/";  // SSO µ¥¸ó Á¢¼Ó URL
+
+	private static Vector PROVIDER_LIST = new Vector();
+	private static final int COOKIE_SESSTION_TIME_OUT = 3000000;
+
+	// 인증 타입 (ID/PW 방식 : 1, 인증서 : 3)
+	private String TOA = "1";
+	private String SSO_DOMAIN = ".kyobo.com";
+
+	private static final int timeout = 15000;
+	private static NXContext context = null;
+
+	static{
+		List<String> serverurlList = new ArrayList<String>();
+		serverurlList.add(ND_URL1);
+		serverurlList.add(ND_URL2);
+
+		context = new NXContext(serverurlList,timeout);
+		CookieManager.setEncStatus(true);
+
+    // 개발/테스트/정규 서버 간 SSO 인증토큰 공유 여부
+		//PROVIDER_LIST.add("ssotest.kyobo.com");
+		PROVIDER_LIST.add("sso.kyobo.com");
+		SECode.setCookiePadding("_V42");
+	}
+
+	// SSO 통합로그인 ID 조회
+	public String getSsoId(HttpServletRequest request) {
+		String sso_id = null;
+		sso_id = CookieManager.getCookieValue(SECode.USER_ID, request);
+		return sso_id;
+	}
+
+	// 통합 SSO 로그인페이지 이동
+	public void goLoginPage(HttpServletResponse response)throws Exception {
+		CookieManager.addCookie(SECode.USER_URL, ASCP_URL, SSO_DOMAIN, response);
+		CookieManager.addCookie(SECode.R_TOA, TOA, SSO_DOMAIN, response);
+
+    //자체 로그인을 할경우 로그인 페이지 Setting
+    if(custom_url != null && !"".equals(custom_url))
+    {
+      CookieManager.addCookie("CLP", custom_url , SSO_DOMAIN, response);
+    }
+    response.sendRedirect(NLS_LOGIN_URL);
+	}
+
+  // SSO 인증토큰 검증을 위한 API
+	public String getEamSessionCheckAndAgentVaild(HttpServletRequest request,HttpServletResponse response) {
+    String retCode = "";
+		try {
+			retCode = CookieManager.verifyNexessCookieAndAgentVaild(request, response, 10, COOKIE_SESSTION_TIME_OUT, PROVIDER_LIST, SERVER_URL, context);
+			//retCode = String.valueOf(CookieManager.readNexessCookie(request,response,".kyobo.com", 120, 43200));
+		} catch(Exception npe) {
+			npe.printStackTrace();
+		}
+		return retCode;
+	}
+	
+	//ND API를 사용해서 쿠키검증하는것(현재 표준에서는 사용안함, 근데 해도 되기는 함)
+	public String getEamSessionCheck2(HttpServletRequest request,HttpServletResponse response)
+	{
+		String retCode = "";
+		try {
+			NXNLSAPI nxNLSAPI = new NXNLSAPI(context);
+			retCode = nxNLSAPI.readNexessCookie(request, response, 0, 0);
+		} catch(Exception npe) {
+			npe.printStackTrace();
+		}
+		return retCode;
+	}
+
+	// SSO 에러페이지 URL
+	public void goErrorPage(HttpServletResponse response, int error_code)throws Exception {
+		CookieManager.removeNexessCookie(SSO_DOMAIN, response);
+		CookieManager.addCookie(SECode.USER_URL, ASCP_URL, SSO_DOMAIN, response);
+		response.sendRedirect(NLS_ERROR_URL + "?errorCode=" + error_code);
+	}
+
+	// SSO 인증토큰 삭제 (SSO 로그아웃)
+	public void removeNexessCookie(HttpServletResponse response)throws Exception {
+		CookieManager.removeNexessCookie(SSO_DOMAIN, response);
+	}
+
+	// 쿠키 생성 (특정 쿠키 생성 시 사용)
+	public void addCookie(String strCookieName, String strCookieValue, HttpServletResponse res) throws Exception {
+		CookieManager.addCookie(strCookieName, strCookieValue, SSO_DOMAIN, res);
+	}
+
+	// 쿠키 삭제 (특정 쿠키 삭제 시 사용)
+	public void removeCookie(String strCookieName, HttpServletResponse res) throws Exception {
+		CookieManager.removeCookie(strCookieName, SSO_DOMAIN, res);
+	}
+
+
+//addCookie(String name, String value, String domain, HttpServletResponse response)
+
+%>
+ --%>

@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html layout:decorator="thymeleaf/layout/layout_blank">
+<head>
+<title layout:title-pattern="$LAYOUT_TITLE : $CONTENT_TITLE">[(#{title.contract})] - [(#{title.update})]</title>
+</head>
+<body>
+
+	<div layout:fragment="content">
+		<section class="content">
+			<div class="container-fluid">
+				<div class="row mt-2">
+					<div class="col-lg-12">
+						<div class="card card-primary card-outline">
+							<div class="card-header">
+								<h5 class="card-title m-0" data-th-text="#{title.update}"></h5>
+							</div>
+							<div class="card-body">
+								<form id="input-form">
+									<div class="row">
+										<div class="col-sm-4">
+											<!-- text input -->
+											<div class="form-group">
+												<label for="CONTRACT_TYPE_CD">[(#{label.contract.contractType})] <i class="fas fa-check text-danger"></i></label>
+												<select id="CONTRACT_TYPE_CD" name="CONTRACT_TYPE_CD"
+													class="form-control select2" required="required" disabled="disabled">
+													<option value="" selected="selected"
+														data-th-text="#{label.common.all}"></option>
+													<option data-th-each="contractType : ${contractTypeCdList}" data-th-value="${contractType.CODE_ID}" data-th-text="${contractType.CODE_NM}"></option>
+												</select>
+												<input type="hidden" name="CONTRACT_TYPE_CD">
+												<!-- <input type="text" id="CONTRACT_TYPE_CD" name="CONTRACT_TYPE_CD" class="form-control" required="required"> -->
+											</div>
+										</div>
+										<div class="col-sm-4">
+											<!-- text input -->
+											<div class="form-group">
+												<label for="CONTRACT_NO">[(#{label.contract.contractTypeNo})] <i class="fas fa-check text-danger"></i></label>
+												<input type="text" id="CONTRACT_NO" name="CONTRACT_NO" class="form-control" required="required" readonly="readonly">
+											</div>
+										</div>
+									</div>
+									<div class="row">
+										<div class="col-sm-4">
+											<!-- text input -->
+											<div class="form-group">
+												<label for="CONTRACT_NAME">[(#{label.contract.contractName})] <i class="fas fa-check text-danger"></i></label>
+												<input type="text" id="CONTRACT_NAME" name="CONTRACT_NAME" class="form-control" required="required">
+											</div>
+										</div>
+										<div class="col-sm-4">
+											<!-- text input -->
+											<div class="form-group">
+												<label for="CONTRACT_DATE">[(#{label.contract.contractDate})] <i class="fas fa-check text-danger"></i></label>
+												<div class="input-group date" id="CONTRACT_DATE" data-target-input="nearest">
+							                        <input type="text" name="CONTRACT_DATE" class="form-control datetimepicker-input" data-toggle="datetimepicker" data-target="#CONTRACT_DATE" required="required">
+							                        <div class="input-group-append" data-target="#CONTRACT_DATE" data-toggle="datetimepicker">
+							                            <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+							                        </div>
+							                    </div>
+											</div>
+										</div>
+									</div>
+									<div class="row">
+										<div class="col-sm-4">
+											<div class="form-group">
+												<label for="AMOUNT">[(#{label.contract.amount})] <i class="fas fa-check text-danger"></i></label>
+												<input type="text" id="AMOUNT" name="AMOUNT" class="form-control" required="required">
+											</div>
+										</div>
+										<div class="col-sm-4">
+											<div class="form-group">
+												<label for="PERIOD">[(#{label.contract.period})] <i class="fas fa-check text-danger"></i></label>
+												<div class="input-group">
+													<input type="text" id="PERIOD" name="PERIOD" class="form-control datetimepicker-range" required="required">
+													<div class="input-group-append">
+														<span class="input-group-text">
+															<i class="far fa-calendar-alt"></i>
+														</span>
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+									<div class="row">
+										<div class="col-sm-4">
+											<div class="form-group">
+												<label for="AMOUNT">[(#{label.contract.delYn})] <i class="fas fa-check text-danger"></i></label>
+												<div>
+													<input type="checkbox" name="DEL_YN" data-bootstrap-switch value="Y">
+												</div>
+											</div>
+										</div>
+									</div>
+								</form>
+							</div>
+							<div class="card-footer">
+								<div class="row">
+									<div class="col-sm-12">
+										<div class="text-center">
+											<button type="button" class="btn btn-sm btn-primary" data-action-button="validate" data-th-text="#{button.update}"></button>
+											<button type="button" class="btn btn-sm btn-outline-primary" data-action-button="cancel" data-th-text="#{button.cancel}"></button>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<!-- /.col-lg-12 -->
+				</div>
+				<!-- /.row -->
+			</div>
+		</section>
+	</div>
+
+	<th:block layout:fragment="script">
+		<script>
+			$(function() {
+				var form = $("#input-form");
+				var validator = form.validate();
+				
+				$('#AMOUNT').inputmask('numeric', {
+					groupSeparator: ',',
+					autoGroup: true
+				});
+				
+				// 계약구분
+				$('select[name="CONTRACT_TYPE_CD"]').createSelectBox();
+				
+				// 계약일자
+				$('#CONTRACT_DATE').createDatePicker({
+					format: 'YYYY/MM/DD'
+				});
+				
+				// 계약기간
+				$('#PERIOD').createDateRangePicker({
+					format: 'YYYY/MM/DD',
+					showDropdowns: true
+				});
+				
+				$("input[data-bootstrap-switch]").each(function(){
+					$(this).bootstrapSwitch({
+						onText: '예',
+						offText: '아니오'
+					});
+				});
+				
+				// 프로세스 처리 함수
+				$.fn.executeAction = function(procType) {
+					switch(procType) {
+						case 'init' :
+							// 폼 데이터 셋팅
+							$.sendData({
+								url: '/bill/contract/findData',
+								data: {
+									CONTRACT_TYPE_CD: '[(${CONTRACT_TYPE_CD})]',
+									CONTRACT_NO: '[(${CONTRACT_NO})]'
+								},
+							}, function(result) {
+								$(form).find('[name="CONTRACT_TYPE_CD"]').val(result['CONTRACT_TYPE_CD']).trigger('change');
+								$(form).find('[name="CONTRACT_NO"]').val(result['CONTRACT_NO']);
+								$(form).find('[name="CONTRACT_NAME"]').val(result['CONTRACT_NAME']);
+								$(form).find('#CONTRACT_DATE').datetimepicker('date', moment(result['CONTRACT_DATE'], 'YYYY/MM/DD'));
+								$(form).find('[name="AMOUNT"]').val(result['AMOUNT']);
+								$(form).find('[name="PERIOD"]').data('daterangepicker').setStartDate(result['START_DATE']);
+								$(form).find('[name="PERIOD"]').data('daterangepicker').setEndDate(result['END_DATE']);
+								$(form).find('[name="DEL_YN"]').bootstrapSwitch('state', (result['DEL_YN'] == 'Y' ? true : false));
+							});
+							
+							break;
+						case 'validate' :	// 정합성 체크
+							if(form.valid()) {
+								$.fn.executeAction('update');
+							}
+							
+							break;
+						case 'update' :		// 수정
+							var formData = {};
+							$(form).serializeArray().map(function(x) {formData[x.name] = x.value;});
+							formData['CONTRACT_DATE'] = $('#CONTRACT_DATE').data('datetimepicker').date().format('YYYYMMDD');
+							formData['START_DATE'] = $('#PERIOD').data('daterangepicker').startDate.format('YYYYMMDD');
+							formData['END_DATE'] = $('#PERIOD').data('daterangepicker').endDate.format('YYYYMMDD');
+							
+							// 폼 데이터 전송
+							$.sendData({
+								url: '/bill/contract/updateData',
+								data: formData,
+								notification: true,
+								isIframe: true
+							}, function(data) {
+								if(data.result == 'S') {
+									parent.$('#list').get(0).contentWindow.location.reload();
+									
+									$.fn.executeAction('cancel');
+								}
+							});
+							
+							break;
+						case 'cancel' :		// 취소
+							var activeTab = parent.tabsComp.tabs('getSelected');
+							var activeIdx = parent.tabsComp.tabs('getTabIndex', activeTab);
+							parent.tabsComp.tabs('close', activeIdx);
+						
+							break;
+						default :
+							;
+					}
+				}
+				
+				// 버튼 이벤트
+				$('[data-action-button]').on('click', function() {
+					$(this).executeAction($(this).data('action-button'));
+				});
+				
+				$.fn.executeAction('init');
+			});
+		</script>
+	</th:block>
+</body>
+</html>
