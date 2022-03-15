@@ -1,2 +1,1 @@
-# study
-* db연결 
+### db 연결 study
