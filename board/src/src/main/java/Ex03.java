@@ -33,8 +33,9 @@ public class Ex03 {
 				}						
 			}		
 		}
-		System.out.println("신고한자 리스트: "+result);		
 		
+		System.out.println("신고한자 리스트: "+result);		
+		 
 		
 		Set<String> setlist =  new HashSet<String>();
 		for (int i = 0; i < report.size(); i++) {
