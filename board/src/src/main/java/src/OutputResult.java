@@ -1,3 +1,4 @@
+package src;
 
 
 import java.util.ArrayList;
@@ -15,7 +16,7 @@ import java.util.Set;
 //["con", "ryan"]						["ryan con", "ryan con", "ryan con", "ryan con"]					3	[0,0]
 //return 하는 배열은 id_list에 담긴 id 순서대로 각 유저가 받은 결과 메일 수를 담으면 됩니다.
 
-public class Ex03 {
+public class OutputResult {
 
 	private int[] solution(String[] id_list, String[] report, int k) {
 		Map<String, String[]> result = new HashMap<>();
@@ -95,7 +96,7 @@ public class Ex03 {
 
 	public static void main(String[] args) {
 		// String[] id_list = {"muzi", "frodo", "apeach", "neo"};
-		Ex03 ab = new Ex03();	
+		OutputResult ab = new OutputResult();	
 		String[] id_list = { "con", "ryan" };
 		String[] report =  {"ryan con", "ryan con", "ryan con", "ryan con"};
 		int k = 2;

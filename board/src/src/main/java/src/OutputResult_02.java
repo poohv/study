@@ -1,7 +1,8 @@
+package src;
 	
 import java.util.*;
 
-public class Ex3_Re {
+public class OutputResult_02 {
 	
 	  static  public int[] solution(String[] id_list, String[] report, int k) {
 		  	//id_list : { "con", "ryan" };
