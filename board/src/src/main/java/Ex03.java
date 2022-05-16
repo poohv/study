@@ -17,67 +17,92 @@ import java.util.Set;
 
 public class Ex03 {
 
-	private List<String> solution(List<String> id_list, List<String> report, int k) {
-		Map<String, Set<String>> result = new HashMap<>();
-		Map<String, Set<String>> stopID = new HashMap<>();
+	private int[] solution(String[] id_list, String[] report, int k) {
+		Map<String, String[]> result = new HashMap<>();
+		Map<String, String[]> stopID = new HashMap<>();
 
+		//{muzi=[neo, frodo], frodo=[neo], apeach=[muzi, frodo]}
+		for (int i = 0; i < report.length; i++) {	
+			//Set<String> reporter =  new HashSet<String>();
+			String[] name = report[i].split(" ");
+			String[] sfa= {name[1]};
+	
+			if(result.get(name[0]) !=null) {
+				if(!result.get(name[0])[0].equals(name[1])) {
+				sfa = new String[sfa.length+1];
+				sfa[0]=name[1];
+				sfa[1]=result.get(name[0])[0];	
+				}
+			}
+			result.put(name[0],sfa);		
+		}
 		
-		for (int i = 0; i < id_list.size(); i++) {	
-			Set<String> reporter =  new HashSet<String>();
-			int	j=0;
+		
+		for (int i = 0; i < report.length; i++) {	
+			//Set<String> reporter =  new HashSet<String>();
+			String[] name = report[i].split(" ");
+			String[] sfa= {name[0]};
 			
-			for ( j = 0; j < report.size(); j++) {			
-				if(id_list.get(i).equals(report.get(j).split(" ")[0])) {				
-					reporter.add(report.get(j).split(" ")[1]);
-					result.put(id_list.get(i), reporter);
-				}						
-			}		
+			if(stopID.get(name[1]) !=null ) {
+				if(!stopID.get(name[1])[0].equals(name[0])) {
+				sfa = new String[sfa.length+1];
+				sfa[0]=name[0];
+				sfa[1]=stopID.get(name[1])[0];	
+				}
+			}
+			stopID.put(name[1],sfa);		
 		}
-		
-		System.out.println("신고한자 리스트: "+result);		
 		 
-		
-		Set<String> setlist =  new HashSet<String>();
-		for (int i = 0; i < report.size(); i++) {
-			setlist.add(report.get(i).split(" ")[1]);			
-		}
-		
-		
-		
-		Iterator<String> it = setlist.iterator();
-		
-		while (it.hasNext()) {
-			String fireid = it.next();
-			Set<String> test =  new HashSet<String>();
-			int i =0;
-			for ( i = 0; i < report.size(); i++) {
-				if(fireid.equals(report.get(i).split(" ")[1])) {
-					test.add(report.get(i).split(" ")[0]);
-					stopID.put(fireid, test);
-				}			
-			}			
-		}
+		/*
+		 * Set<String> setlist = new HashSet<String>(); for (int i = 0; i <
+		 * report.length; i++) { setlist.add(report[i].split(" ")[1]); }
+		 * 
+		 * 
+		 * Iterator<String> it = setlist.iterator();
+		 * 
+		 * while (it.hasNext()) { String fireid = it.next(); Set<String> test = new
+		 * HashSet<String>(); int i =0; for ( i = 0; i < report.length; i++) {
+		 * if(fireid.equals(report[i].split(" ")[1])) {
+		 * test.add(report[i].split(" ")[0]); stopID.put(fireid, test); } } }
+		 */
 		
 		System.out.println("신고자 리스트: "+stopID);
+		
+		int[] tnt = new int[id_list.length];
+		
+		for (int j = 0; j < id_list.length; j++) {
+			int b = 0;
+			if(result.get(id_list[j])!=null) {
+			String[] aa = result.get(id_list[j]); 	
+			
+		
+			for (int i = 0; i < aa.length; i++) {
+				if(stopID.get(aa[i]).length >= 2) {
+					++b;
+				}
+			}	
+			tnt[j]= b;
+			}
+		}
+			
+	
 		
 		//중복수량 체크
 		//Collections.frequency(a,b); 
 		
-	
-		return null;
+		return tnt;
 	}
 
 	public static void main(String[] args) {
 		// String[] id_list = {"muzi", "frodo", "apeach", "neo"};
-		Ex03 soultion = new Ex03();
-
-		List<String> output = new ArrayList<>();
-		List<String> id_list = new ArrayList<>(Arrays.asList(new String[] { "muzi", "frodo", "apeach", "neo" }));
-		List<String> report = new ArrayList<>(
-				Arrays.asList(new String[] { "muzi frodo", "apeach frodo", "frodo neo", "muzi neo", "apeach muzi" }));
+		Ex03 ab = new Ex03();	
+		String[] id_list = { "con", "ryan" };
+		String[] report =  {"ryan con", "ryan con", "ryan con", "ryan con"};
 		int k = 2;
-
-		output = soultion.solution(id_list, report, k);
+		int[] output = 	ab.solution(id_list, report, k);
+		
+		System.out.println(output);
+	
 		
 
 	}
