@@ -45,19 +45,12 @@ public class OutputResult_03 {
 				 }			
 			}	
 		}
-		}
-	
-		
-		
-				
+	}			
 		return anwer;
 		
 	}
 	
 
-	
-	
-	
 
 
 	public static void main(String[] args) {
