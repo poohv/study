@@ -25,17 +25,12 @@ public class OutputResult_03 {
 		for (int i = 0; i < report.length; i++) {
 		 String reportN[] = report[i].split(" ");
 		 String stopid = reportN[1] , userid = reportN[0];
- 
+
 		 if(!stopidlist.containsKey(stopid)) {
 			 stopidlist.put(stopid, new ArrayList<Integer>());	
 		 }
 		 if(! stopidlist.get(stopid).contains(index.get(userid))) {	 
-			 stopidlist.get(stopid).add(index.get(userid));
-		 }
-	
-			 
-		
-		 
+			 stopidlist.get(stopid).add(index.get(userid));}	 
 		}
 		
 		for (int i = 0; i < id_list.length; i++) {
@@ -47,10 +42,8 @@ public class OutputResult_03 {
 			int a = tt.get(j);
 			 if(stopidlist.get(id).size() >= k) {
 					anwer[a]++;
-				 }
-			
-			}
-	
+				 }			
+			}	
 		}
 		}
 	
