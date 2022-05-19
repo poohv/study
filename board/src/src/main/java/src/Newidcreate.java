@@ -38,18 +38,24 @@ public class Newidcreate {
             answer = answer.substring(0, 15);	
      
         if (answer.endsWith("."))
-        answer=	answer.substring(0,answer.length()-1);
+        answer =answer.substring(0,answer.length()-1);
+        
+        String add = answer.substring(answer.length()-1, answer.length());
+        
+        while(answer.length() < 3) {
+        	answer += add;
+        	
+        }
  
        
       
-        if(answer.length() <= 2) {
-        String add = answer.substring(answer.length()-1, answer.length());
-        if(answer.length() <= 3 )
-        	for (int i = 0; answer.length() < 3; i++) {
-        		answer = answer+add;		
-			}
-        
-        }
+		/*
+		 * if(answer.length() <= 2) { String add = answer.substring(answer.length()-1,
+		 * answer.length()); if(answer.length() <= 3 ) for (int i = 0; answer.length() <
+		 * 3; i++) { answer = answer+add; }
+		 * 
+		 * }
+		 */
         
         return answer;
     }
@@ -61,7 +67,7 @@ public class Newidcreate {
 		String basfd= "=.=";
 		String sfas= "123_.def";
 		
-		System.out.println(solution(basfd));
+		System.out.println(solution(typeone));
 		System.out.println(solution(typetwo));
 		System.out.println(solution(typethree));
 		System.out.println(solution(basfd));
