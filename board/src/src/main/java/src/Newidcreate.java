@@ -30,10 +30,10 @@ public class Newidcreate {
       
         if(answer.startsWith(".")) {
         	  answer=answer.substring(1,answer.length());
-        	  if(answer == "") 
+        	  if(answer.isEmpty()) 
         	     answer = "a";  	
         }
-        
+   
         if(answer.length() >= 16)
             answer = answer.substring(0, 15);	
      
@@ -45,18 +45,7 @@ public class Newidcreate {
         while(answer.length() < 3) {
         	answer += add;
         	
-        }
- 
-       
-      
-		/*
-		 * if(answer.length() <= 2) { String add = answer.substring(answer.length()-1,
-		 * answer.length()); if(answer.length() <= 3 ) for (int i = 0; answer.length() <
-		 * 3; i++) { answer = answer+add; }
-		 * 
-		 * }
-		 */
-        
+        }       
         return answer;
     }
 
