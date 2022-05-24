@@ -26,7 +26,7 @@ public class NumberWord {
 		}
 		
 		
-        int answer = 0;
+        int answer = Integer.parseInt(s);
 
         return answer;
         
@@ -35,9 +35,12 @@ public class NumberWord {
 	public static void main(String[] args) {
 		//1478,234567,234567,123
 		
-		  String[] params = {"one4seveneight","23four5six7","2three45sixseven","123"};
+		  String[] params = {"one4seveneight","23four5six7","2three45sixseven","123","oneoneone"};
 		  
-		  for(int i=0; params.length > i ; i++) { solution(params[i]); }
+		  
+		  for(int i=0; params.length > i ; i++) { 
+			  
+			  System.out.println(solution(params[i])); }
 		 
 		
 
