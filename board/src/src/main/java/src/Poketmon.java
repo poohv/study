@@ -5,8 +5,11 @@ import java.util.Set;
 
 public class Poketmon {
 	//[3,3,3,2,2,4] - 3	
-	//[3,3,3,2,2,2] - 2	
+	//6 , 3, ,3 = 3
+	//[3,3,3,2,2,2] - 2
+	//6, 3, 2 =  2
 	//[3,1,2,3] - 2
+	
 	
 	  public static int solution(int[] nums) {
 	        int answer = 0;
@@ -18,11 +21,12 @@ public class Poketmon {
 	        	//[3,2,4] - 3 = 3
 	        	//[1,2,3] - 2 = 2
 	        	//[3,2] - 3 = 2
-	        	
+	       
+	        
 			}
 	        
-	        if(aa.size()==len) {answer = len;}
-    		else if(aa.size() > len) {answer = aa.size()-1;}
+	           
+	        if(aa.size()>=len) {answer = len;} 
     		else {answer = aa.size();}
 	        
 	        return answer;
@@ -31,6 +35,8 @@ public class Poketmon {
 	public static void main(String[] args) {
 		
 			int[] nums = {3,1,2,3,4,5};
+	
+		
 			System.out.println(solution(nums));
 			
 			
