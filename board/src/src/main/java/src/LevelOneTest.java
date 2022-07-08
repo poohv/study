@@ -13,6 +13,8 @@ public class LevelOneTest {
 			
 			char ch = s.charAt(i);
 			
+			
+			
 			if(ch==' ') { //공백
 				answer += ch;
 				continue;
@@ -30,6 +32,7 @@ public class LevelOneTest {
 			else if(ch>='A' && ch<='Z') { //대문자
 				if(ch+n > 'Z') {
 					answer += (char)(ch-26+n);
+					
 				}else {
 					answer += (char)(ch+n);
 				}

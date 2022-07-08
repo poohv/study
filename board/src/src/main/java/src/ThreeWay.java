@@ -3,11 +3,9 @@ package src;
 public class ThreeWay {
 	
 	public int solution(int n) {
-        int answer = 0;
-        
-        
-        
-        return answer;
+		 int answer = 0;
+	        
+		 return 0;
     }
 	
 	
