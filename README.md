@@ -1,1 +1,1 @@
-### db 연결 study
+### MY Study directory
