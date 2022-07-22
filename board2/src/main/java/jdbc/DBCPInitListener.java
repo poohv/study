@@ -16,12 +16,13 @@ import org.apache.commons.dbcp2.PoolingDriver;
 import org.apache.commons.pool2.impl.GenericObjectPool;
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 
+//DB Ä¿³Ø¼Ç ÄÚµå
 public class DBCPInitListener implements ServletContextListener {
 
 	@Override
 	public void contextInitialized(ServletContextEvent sce) {
-		String poolConfig = 
-				sce.getServletContext().getInitParameter("poolConfig");
+		String poolConfig = sce.getServletContext().getInitParameter("poolConfig");
+		
 		Properties prop = new Properties();
 		try {
 			prop.load(new StringReader(poolConfig));
@@ -52,13 +53,17 @@ public class DBCPInitListener implements ServletContextListener {
 
 			PoolableConnectionFactory poolableConnFactory = 
 					new PoolableConnectionFactory(connFactory, null);
-			poolableConnFactory.setValidationQuery("select 1");
-
+			String validationQuery = prop.getProperty("validationQuery");
+			if (validationQuery != null && !validationQuery.isEmpty()) {
+				poolableConnFactory.setValidationQuery(validationQuery);
+			}
 			GenericObjectPoolConfig poolConfig = new GenericObjectPoolConfig();
 			poolConfig.setTimeBetweenEvictionRunsMillis(1000L * 60L * 5L);
 			poolConfig.setTestWhileIdle(true);
-			poolConfig.setMinIdle(5);
-			poolConfig.setMaxTotal(50);
+			int minIdle = getIntProperty(prop, "minIdle", 5);
+			poolConfig.setMinIdle(minIdle);
+			int maxTotal = getIntProperty(prop, "maxTotal", 50);
+			poolConfig.setMaxTotal(maxTotal);
 
 			GenericObjectPool<PoolableConnection> connectionPool = 
 					new GenericObjectPool<>(poolableConnFactory, poolConfig);
@@ -74,7 +79,14 @@ public class DBCPInitListener implements ServletContextListener {
 		}
 	}
 
+	private int getIntProperty(Properties prop, String propName, int defaultValue) {
+		String value = prop.getProperty(propName);
+		if (value == null) return defaultValue;
+		return Integer.parseInt(value);
+	}
+
 	@Override
 	public void contextDestroyed(ServletContextEvent sce) {
 	}
+
 }

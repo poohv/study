@@ -21,7 +21,6 @@ public class Ex03 {
 		Map<String, Set<String>> result = new HashMap<>();
 		Map<String, Set<String>> stopID = new HashMap<>();
 
-		
 		for (int i = 0; i < id_list.size(); i++) {	
 			Set<String> reporter =  new HashSet<String>();
 			int	j=0;
@@ -42,9 +41,7 @@ public class Ex03 {
 		}
 		
 		
-		
-		Iterator<String> it = setlist.iterator();
-		
+		Iterator<String> it = setlist.iterator();		
 		while (it.hasNext()) {
 			String fireid = it.next();
 			Set<String> test =  new HashSet<String>();
@@ -62,22 +59,40 @@ public class Ex03 {
 		//중복수량 체크
 		//Collections.frequency(a,b); 
 		
+		List<Integer> emailnum =  new ArrayList<>();
+		
+		for (int i = 0; i < id_list.size(); i++) {
+			int b =0;
+			if(result.get(id_list.get(i))!=null) {
+		 Iterator<String> a = result.get(id_list.get(i)).iterator();
+		 while (a.hasNext()) {
+				String reportid = a.next();
+			int count = stopID.get(reportid).size();
+					
+				if(count >= k) {
+					++b;				
+				}				
+			}
+			}
+		 emailnum.add(b);
+		}
+		
+		return null;
+		}
 	
+	public List<Integer> Emailcount() {
 		return null;
 	}
 
 	public static void main(String[] args) {
 		// String[] id_list = {"muzi", "frodo", "apeach", "neo"};
 		Ex03 soultion = new Ex03();
-
+		int k = 2;
 		List<String> output = new ArrayList<>();
 		List<String> id_list = new ArrayList<>(Arrays.asList(new String[] { "muzi", "frodo", "apeach", "neo" }));
-		List<String> report = new ArrayList<>(
-				Arrays.asList(new String[] { "muzi frodo", "apeach frodo", "frodo neo", "muzi neo", "apeach muzi" }));
-		int k = 2;
-
-		output = soultion.solution(id_list, report, k);
+		List<String> report = new ArrayList<>(Arrays.asList(new String[] { "muzi frodo", "apeach frodo", "frodo neo", "muzi neo", "apeach muzi" }));
 		
+		output = soultion.solution(id_list, report, k);
 
 	}
 
