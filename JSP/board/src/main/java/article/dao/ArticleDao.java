@@ -60,7 +60,8 @@ public class ArticleDao {
 	private Timestamp toTimestamp(Date date) {
 		return new Timestamp(date.getTime());
 	}
-
+	
+	//페이지 개수를 구하기 위한 전체 게시글 개수
 	public int selectCount(Connection conn) throws SQLException {
 		Statement stmt = null;
 		ResultSet rs = null;
@@ -76,21 +77,25 @@ public class ArticleDao {
 			JdbcUtil.close(stmt);
 		}
 	}
-
+	
+	//지정한 행 번호에 해당하는 게시글 목록
 	public List<Article> select(Connection conn, int startRow, int size) throws SQLException {
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
 		try {
-			pstmt = conn.prepareStatement("select * from article " +
-					"order by article_no desc limit ?, ?");
+			pstmt = conn.prepareStatement("select * from article " +"order by article_no desc limit ?, ?");
 			pstmt.setInt(1, startRow);
 			pstmt.setInt(2, size);
 			rs = pstmt.executeQuery();
+			
 			List<Article> result = new ArrayList<>();
+			
 			while (rs.next()) {
+				
 				result.add(convertArticle(rs));
 			}
 			return result;
+			
 		} finally {
 			JdbcUtil.close(rs);
 			JdbcUtil.close(pstmt);
