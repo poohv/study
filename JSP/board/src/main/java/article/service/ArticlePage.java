@@ -14,10 +14,14 @@ public class ArticlePage {
 	private int endPage;
 
 	public ArticlePage(int total, int currentPage, int size, List<Article> content) {
-		
+		//전체 페이지
 		this.total = total;
+		//사용자가 요청한 페이지 보관
 		this.currentPage = currentPage;
+		//화면에 출력할 게시글 목록
 		this.content = content;
+		
+		
 		if (total == 0) {
 			totalPages = 0;
 			startPage = 0;
