@@ -40,6 +40,8 @@
 		</div>
 	</div>
 	<!-- /.box-body -->
+	<input type='hidden' name='page' value="${cri.page}">
+	<input type='hidden' name='perPageNum' value="${cri.perPageNum}">	
 </form>
 
 
@@ -56,7 +58,9 @@
 		console.log(formObj);
 
 		$(".btn-warning").on("click", function() {
-			self.location = "/board/listAll";
+			formObj.attr("action", "/board/listPage");
+			formObj.attr("method", "get");	
+			formObj.submit();
 		});
 
 		$(".btn-primary").on("click", function() {
