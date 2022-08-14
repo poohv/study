@@ -1,6 +1,8 @@
 package org.zerock.domain;
 
 public class Criteria {
+	
+	
 
   private int page;
   private int perPageNum;
